@@ -2,7 +2,7 @@ import React from 'react';
 import {Save, Check} from "lucide-react";
 import {onboardingStore} from "../../stores/onboardingStore.js";
 
-function SaveButton(itemId, onSave, variant = 'primary', size = 'md') {
+function SaveButton({itemId, onSave, variant = 'primary', size = 'md'}) {
     const {savingItems, setSaving} = onboardingStore();
     const isSaving = savingItems.has(itemId);
 
@@ -11,7 +11,7 @@ function SaveButton(itemId, onSave, variant = 'primary', size = 'md') {
         try {
             await onSave();
             // simulate a save operation
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            // await new Promise(resolve => setTimeout(resolve, 5000));
         } catch (error) {
             console.error("Error saving item:", error);
         } finally {
