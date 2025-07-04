@@ -83,7 +83,7 @@ export async function login(email, password, navigate) {
             const token = response.data.token;
             const expiry = new Date().getTime() + 604800 * 1000;
             localStorage.setItem('authToken', JSON.stringify({ token, expiry }));
-            toast.success("Account created successfully! Redirecting to login...", {
+            toast.success("Logging In...", {
             duration: 5000,
             style: {
                 border: '1px solid rgba(47, 200, 122, 0.5)',
