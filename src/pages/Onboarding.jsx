@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProgressBar from "../components/Onboarding/ProgressBar.jsx";
 import PersonalDetails from "../components/Onboarding/PersonalDetails.jsx";
 import { Toaster } from 'react-hot-toast';
+import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
+import { onboardingStore } from '../stores/onboardingStore.js';
 
 function Onboarding() {
+    const {
+        updateOriginalData
+    } = onboardingStore();
+
+    useEffect(() => {
+        const OriginalData = async () => {
+            const data = await getProfileDetails();
+            updateOriginalData(data);
+        };
+        OriginalData();
+    }, [])
     return (
         <div className='min-h-screen bg-gray-950 pt-24 pb-12 overflow-hidden'>
             {/*Background Elements*/}

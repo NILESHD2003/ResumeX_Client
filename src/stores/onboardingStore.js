@@ -17,7 +17,7 @@ export const onboardingStore = create()(
                 maritalStatus: '',
                 militaryService: '',
                 drivingLicense: '',
-                genderPronouns: '',
+                genderPronoun: '',
                 visa: '',
                 socialLinks: [
                     // { platform: 'linkedin', url: '', link: '' },
@@ -31,31 +31,33 @@ export const onboardingStore = create()(
                 ],
             },
 
-            originalPersonalDetails: {
-                fullName: '',
-                jobTitle: '',
-                email: '',
-                phone: '',
-                location: '',
-                personalInfo: '',
-                dateOfBirth: '',
-                nationality: '',
-                passport_govt_id: '',
-                maritalStatus: '',
-                militaryService: '',
-                drivingLicense: '',
-                genderPronouns: '',
-                visa: '',
-                socialLinks: [
-                    // { platform: 'linkedin', url: '', link: '' },
-                    // { platform: 'github', url: '', link: '' },
-                    // { platform: 'twitter', url: '', link: '' },
-                    // { platform: 'youtube', url: '', link: '' },
-                    // { platform: 'dribbble', url: '', link: '' },
-                    // { platform: 'behance', url: '', link: '' },
-                    // { platform: 'stackoverflow', url: '', link: '' },
-                    // { platform: 'website', url: '', link: '' },
-                ],
+            originalData: {
+                personalDetails: {
+                    fullName: '',
+                    jobTitle: '',
+                    email: '',
+                    phone: '',
+                    location: '',
+                    personalInfo: '',
+                    dateOfBirth: '',
+                    nationality: '',
+                    passport_govt_id: '',
+                    maritalStatus: '',
+                    militaryService: '',
+                    drivingLicense: '',
+                    genderPronoun: '',
+                    visa: '',
+                    socialLinks: [
+                        // { platform: 'linkedin', url: '', link: '' },
+                        // { platform: 'github', url: '', link: '' },
+                        // { platform: 'twitter', url: '', link: '' },
+                        // { platform: 'youtube', url: '', link: '' },
+                        // { platform: 'dribbble', url: '', link: '' },
+                        // { platform: 'behance', url: '', link: '' },
+                        // { platform: 'stackoverflow', url: '', link: '' },
+                        // { platform: 'website', url: '', link: '' },
+                    ],
+                },
             },
 
             updatePersonalDetails: (details) => {
@@ -67,10 +69,10 @@ export const onboardingStore = create()(
                 }));
             },
 
-            updateOriginalPersonalDetails: (details) => {
+            updateOriginalData: (details) => {
                 set((state) => ({
-                    originalPersonalDetails: {
-                        ...state.originalPersonalDetails,
+                    originalData: {
+                        ...state.originalData,
                         ...details
                     }
                 }));
@@ -217,7 +219,7 @@ export const onboardingStore = create()(
             name: "onboarding-storage",
             partialize: (state) => ({
                 personalDetails: state.personalDetails,
-                originalPersonalDetails: state.originalPersonalDetails,
+                originalData: state.originalData,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,

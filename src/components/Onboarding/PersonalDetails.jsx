@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import SectionHeader from "./SectionHeader.jsx";
 import {onboardingStore} from "../../stores/onboardingStore.js";
 import SaveButton from "./SaveButton.jsx";
@@ -6,14 +6,14 @@ import EmptyState from "./EmptyState.jsx";
 import {CameraIcon, UserIcon, LinkedinLogoIcon, GithubLogoIcon, XLogoIcon, YoutubeLogoIcon, GlobeIcon, DribbbleLogoIcon, BehanceLogoIcon, StackOverflowLogoIcon, LinkIcon} from "@phosphor-icons/react";
 import { Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { patchPersonalDetails, getPersonalDetails } from '../../services/operations/personalDetailsAPI.js';
+import { patchPersonalDetails } from '../../services/operations/personalDetailsAPI.js';
 
 function PersonalDetails() {
     const {
         personalDetails,
-        originalPersonalDetails,
+        originalData,
         updatePersonalDetails,
-        updateOriginalPersonalDetails,
+        updateOriginalData,
         expandedSections,
         updateSocialLink,
         visibleSocialLinks,
@@ -63,13 +63,14 @@ function PersonalDetails() {
                 return;
             }
 
-            if (personalDetails[key] !== originalPersonalDetails[key]) {
+            if (personalDetails[key] !== originalData.personalDetails[key]) {
                 updatedPayload[key] = personalDetails[key];
             }
         });
+        console.log(updatedPayload);
 
-        const originalDate = originalPersonalDetails.dateOfBirth
-            ? new Date(originalPersonalDetails.dateOfBirth).toISOString().split("T")[0]
+        const originalDate = originalData.personalDetails.dateOfBirth
+            ? new Date(originalData.personalDetails.dateOfBirth).toISOString().split("T")[0]
             : "";
             const currentDate = personalDetails.dateOfBirth
             ? new Date(personalDetails.dateOfBirth).toISOString().split("T")[0]
@@ -106,7 +107,7 @@ function PersonalDetails() {
 
         
         const currentLinks = formatLinks(personalDetails.socialLinks || []);
-        const originalLinks = formatLinks(originalPersonalDetails.socialLinks || []);
+        const originalLinks = formatLinks(originalData.personalDetails.socialLinks || []);
 
         const linksChanged =
             currentLinks.length !== originalLinks.length ||
@@ -134,7 +135,7 @@ function PersonalDetails() {
 
         try {
             await patchPersonalDetails(updatedPayload);
-            updateOriginalPersonalDetails(updatedPayload);
+            updateOriginalData({personalDetails: personalDetails});
         } catch (error) {
             console.error("Update failed", error)
         }
@@ -158,7 +159,7 @@ function PersonalDetails() {
     const additionaDetailsFields = [
         {key: "dateOfBirth", label: "Date of Birth", type: "date" },
         {key: "nationality", label: "Nationality", type: "text" },
-        {key: "genderPronouns", label: "Gender Pronoun", type: "text" },
+        {key: "genderPronoun", label: "Gender Pronoun", type: "text" },
         {key: "maritalStatus", label: "Marital Status", type: "select", options: ["He/Him", "She/Her", "They/Them", "Prefer Not to Say"] },
         {key: "passport_govt_id", label: "Passport / Govermnent ID", type: "select", options: ["Single", "Married", "Divorced", "Widowed", "Separated", "In a relationship / Partnered", "Prefer Not to Say"] },
         {key: "drivingLicense", label: "Driving License", type: "text" },
@@ -253,14 +254,6 @@ function PersonalDetails() {
     const handleChangeLink = (key, newValue) => {
         updateSocialLink(key, newValue); // expects { url, link }
     };
-
-    useEffect(() => {
-        const OriginalData = async () => {
-            const data = await getPersonalDetails();
-            updateOriginalPersonalDetails(data);
-        };
-        OriginalData();
-    }, [])
 
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden max-w-4xl">
