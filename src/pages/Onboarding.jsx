@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProgressBar from "../components/Onboarding/ProgressBar.jsx";
 import PersonalDetails from "../components/Onboarding/PersonalDetails.jsx";
+import { Toaster } from 'react-hot-toast';
+import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
+import { onboardingStore } from '../stores/onboardingStore.js';
 
 function Onboarding() {
+    const {
+        updateOriginalData
+    } = onboardingStore();
+
+    useEffect(() => {
+        const OriginalData = async () => {
+            const data = await getProfileDetails();
+            updateOriginalData(data);
+        };
+        OriginalData();
+    }, [])
     return (
         <div className='min-h-screen bg-gray-950 pt-24 pb-12 overflow-hidden'>
             {/*Background Elements*/}
+            <Toaster 
+                 position='bottom-right'
+                reverseOrder={false}
+            />
             <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/10 to-transparent z-0"></div>
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 md:top-1/4 md:-left-64 w-56 h-56 md:w-96 md:h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 md:bottom-1/3 md:-right-64 w-56 h-56 md:w-96 md:h-96 bg-purple-500/5 rounded-full blur-3xl"></div>

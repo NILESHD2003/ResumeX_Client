@@ -6,7 +6,7 @@ function Navbar() {
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const location = useLocation();
-    const isAuthPage = ['/login', '/signup'].includes(location.pathname);
+    const isAuthPage = ['/login', '/signup', '/create-account'].includes(location.pathname);
     const isOnboardingPage = location.pathname.startsWith('/onboarding');
     const isLoggedIn = ['/dashboard', '/onboarding', '/generate/resume', '/generate/cover-letter'].includes(location.pathname);
 

@@ -4,16 +4,26 @@ import {onboardingStore} from "../../stores/onboardingStore.js";
 import SaveButton from "./SaveButton.jsx";
 import EmptyState from "./EmptyState.jsx";
 import {CameraIcon, UserIcon, LinkedinLogoIcon, GithubLogoIcon, XLogoIcon, YoutubeLogoIcon, GlobeIcon, DribbbleLogoIcon, BehanceLogoIcon, StackOverflowLogoIcon, LinkIcon} from "@phosphor-icons/react";
+import { Trash } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { patchPersonalDetails } from '../../services/operations/personalDetailsAPI.js';
 
 function PersonalDetails() {
     const {
         personalDetails,
+        originalData,
         updatePersonalDetails,
+        updateOriginalData,
         expandedSections,
-        handleSave,
+        updateSocialLink,
+        visibleSocialLinks,
+        showSocialLinks,
+        hideSocialLinks,
+        visibleAdditionalDetails,
+        showAdditionalDetails,
+        hideAdditionalDetails,
         profilePicture,
         updateProfilePicture,
-        updateSocialLink
     } = onboardingStore();
     const isExpanded = expandedSections.has('personal');
 
@@ -23,19 +33,139 @@ function PersonalDetails() {
         // Use the updateProfilePicture method to save the uploaded image URL to the store
     }
 
+    const handleSave = async () => {
+        const updatedPayload = {}
+
+        const emptyFields = [];
+        if (!personalDetails.fullName.trim()) {
+            emptyFields.push("Full Name");
+        }
+        if (!personalDetails.email.trim()) {
+            emptyFields.push("Email");
+        }
+        if (!personalDetails.phone.trim()) {
+            emptyFields.push("Phone no.");
+        }
+
+        if (emptyFields.length > 0) {
+            toast.error(`Following Fields need to be filled: ${emptyFields.join(', ')}`, {
+                style: {
+                    border: '1px solid orange',
+                    backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                    color: 'orange'
+                }
+            });
+            return;
+        }
+
+        Object.keys(personalDetails).forEach((key) => {
+            if (key === "socialLinks" || key === "dateOfBirth") {
+                return;
+            }
+
+            if (personalDetails[key] !== originalData.personalDetails[key]) {
+                updatedPayload[key] = personalDetails[key];
+            }
+        });
+        console.log(updatedPayload);
+
+        const originalDate = originalData.personalDetails.dateOfBirth
+            ? new Date(originalData.personalDetails.dateOfBirth).toISOString().split("T")[0]
+            : "";
+            const currentDate = personalDetails.dateOfBirth
+            ? new Date(personalDetails.dateOfBirth).toISOString().split("T")[0]
+            : "";
+        
+        if (currentDate !== originalDate) {
+            updatedPayload.dateOfBirth = currentDate;
+        }
+
+       const formatLinks = (links) => {
+            const isValidUrl = (url) => {
+                try {
+                    const parsed = new URL(url);
+                    return parsed.protocol === "http:" || parsed.protocol === "https:";
+                } catch (_) {
+                    return false;
+                }
+            };
+
+            return links
+                .filter(
+                    (link) =>
+                        typeof link.url === "string" &&
+                        link.url.trim() !== "" &&
+                        typeof link.platform === "string" &&
+                        link.platform.trim() !== "" &&
+                        isValidUrl(link.url.trim())
+                )
+                .map(({ platform, url }) => ({
+                    platform: platform.trim(),
+                    url: url.trim(),
+                }));
+        };
+
+        
+        const currentLinks = formatLinks(personalDetails.socialLinks || []);
+        const originalLinks = formatLinks(originalData.personalDetails.socialLinks || []);
+
+        const linksChanged =
+            currentLinks.length !== originalLinks.length ||
+            currentLinks.some(
+                (link, index) =>
+                !originalLinks[index] ||
+                link.url !== originalLinks[index].url ||
+                link.platform !== originalLinks[index].platform
+            );
+
+        if (linksChanged) {
+            updatedPayload.socialLinks = currentLinks;
+        }
+
+        if (Object.keys(updatedPayload).length === 0) {
+            toast("No Changes to Save", {
+                style: {
+                border: '1px solid #3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6'
+            }
+            })
+            return;
+        }
+
+        try {
+            await patchPersonalDetails(updatedPayload);
+            updateOriginalData({personalDetails: personalDetails});
+        } catch (error) {
+            console.error("Update failed", error)
+        }
+
+    }
+
     const [pronoun, setPronoun] = React.useState('Select your pronoun');
     const [maritalStatus, setMaritalStatus] = React.useState('Select your status');
 
     const socialPlatformsList = [
-        { platform: "LinkedIn", icon: LinkedinLogoIcon, key: "linkedin" },
-        { platform: "GitHub", icon: GithubLogoIcon, key: "github" },
-        { platform: "X", icon: XLogoIcon, key: "x" },
-        { platform: "YouTube", icon: YoutubeLogoIcon, key: "youtube" },
-        { platform: "Dribbble", icon: DribbbleLogoIcon, key: "dribbble" },
-        { platform: "Behance", icon: BehanceLogoIcon, key: "behance" },
-        { platform: "StackOverflow", icon: StackOverflowLogoIcon, key: "stackoverflow" },
-        { platform: "Website", icon: GlobeIcon, key: "website" },
+        { platform: "LinkedIn", icon: LinkedinLogoIcon, key: "LinkedIn" },
+        { platform: "GitHub", icon: GithubLogoIcon, key: "GitHub" },
+        { platform: "X", icon: XLogoIcon, key: "Twitter" },
+        { platform: "YouTube", icon: YoutubeLogoIcon, key: "YouTube" },
+        { platform: "Dribbble", icon: DribbbleLogoIcon, key: "Dribbble" },
+        { platform: "Behance", icon: BehanceLogoIcon, key: "Behance" },
+        { platform: "StackOverflow", icon: StackOverflowLogoIcon, key: "Stackoverflow" },
+        { platform: "Website", icon: GlobeIcon, key: "Website" },
     ];
+
+    const additionaDetailsFields = [
+        {key: "dateOfBirth", label: "Date of Birth", type: "date" },
+        {key: "nationality", label: "Nationality", type: "text" },
+        {key: "genderPronoun", label: "Gender Pronoun", type: "text" },
+        {key: "maritalStatus", label: "Marital Status", type: "select", options: ["He/Him", "She/Her", "They/Them", "Prefer Not to Say"] },
+        {key: "passport_govt_id", label: "Passport / Govermnent ID", type: "select", options: ["Single", "Married", "Divorced", "Widowed", "Separated", "In a relationship / Partnered", "Prefer Not to Say"] },
+        {key: "drivingLicense", label: "Driving License", type: "text" },
+        {key: "militaryService", label: "Military Service", type: "text" },
+        {key: "visa", label: "Visa", type: "text" },
+    ]
 
 
     function SocialLinkInput({ platform, icon: Icon, value, onChange }) {
@@ -53,7 +183,7 @@ function PersonalDetails() {
         };
 
         return (
-            <div className="relative flex items-center space-x-3 min-w-0">
+            <div className="relative flex w-full items-center space-x-3 min-w-0">
                 {/* Left icon inside input */}
                 <div className="absolute left-3 pointer-events-none">
                     <Icon className="h-5 w-5 text-[#0A66C2]" />
@@ -231,7 +361,7 @@ function PersonalDetails() {
                                 placeholder="Software Engineer"
                             />
                         </div>
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Personal Info
                             </label>
@@ -242,106 +372,73 @@ function PersonalDetails() {
                                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 placeholder="About Yourself"
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Additional Details */}
                     <div className="space-y-4">
                         <h4 className="font-medium text-gray-300">Additional Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Date of Birth
-                                </label>
-                                <input
-                                    type="date"
-                                    value={personalDetails.dateOfBirth}
-                                    onChange={(e) => updatePersonalDetails({dateOfBirth: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Nationality
-                                </label>
-                                <input
-                                    type="text"
-                                    value={personalDetails.nationality}
-                                    onChange={(e) => updatePersonalDetails({nationality: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Gender Pronoun
-                                </label>
-                                <select value={pronoun} onChange={(e)=>{setPronoun(e.target.value)}} className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                                    <option key='' value='Select your pronoun'>Select your pronoun</option>
-                                    <option key='he/him' value='He/Him'>He/Him</option>
-                                    <option key='she/her' value='She/Her'>She/Her</option>
-                                    <option key='they/them' value='They/ Them'>They/ Them</option>
-                                    <option key='prefer not to say' value='Prefer Not to Say'>Prefer Not to Say</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Marital Status
-                                </label>
-                                <select value={maritalStatus} onChange={(e)=>{setMaritalStatus(e.target.value)}} className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                                    <option key='' value='Select your status'>Select your pronoun</option>
-                                    <option key='single' value='Single'>Single</option>
-                                    <option key='married' value='Married'>Married</option>
-                                    <option key='divorced' value='Divorced'>Divorced</option>
-                                    <option key='widowed' value='Widowed'>Widowed</option>
-                                    <option key='separated' value='Separated'>Separated</option>
-                                    <option key='in a relationship / partnered' value='In a relationship / Partnered'>In a relationship / Partnered</option>
-                                    <option key='prefer not to say' value='Prefer Not to Say'>Prefer Not to Say</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Passport/ Government ID
-                                </label>
-                                <input
-                                    type="text"
-                                    value={personalDetails.passport_govt_id}
-                                    onChange={(e) => updatePersonalDetails({passport_govt_id: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Driving License
-                                </label>
-                                <input
-                                    type="text"
-                                    value={personalDetails.drivingLicense}
-                                    onChange={(e) => updatePersonalDetails({drivingLicense: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Military Service
-                                </label>
-                                <input
-                                    type="text"
-                                    value={personalDetails.militaryService}
-                                    onChange={(e) => updatePersonalDetails({militaryService: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Visa
-                                </label>
-                                <input
-                                    type="text"
-                                    value={personalDetails.visa}
-                                    onChange={(e) => updatePersonalDetails({visa: e.target.value})}
-                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
+                            {additionaDetailsFields.map(({key, label, type, options}) => {
+                                const visible = visibleAdditionalDetails[key]
+
+                                return (
+                                    <div key={key}>
+                                        {visible ? (
+                                            <>
+                                                <label className='block text-sm font-medium text-gray-300 mb-2'>
+                                                    {label}
+                                                </label>
+                                                {type === "select" ? (
+                                                    <div className='flex'>
+                                                        <select
+                                                            value={personalDetails[key] || ""}
+                                                            onChange={(e) => (updatePersonalDetails({ [key]: e.target.value }))}
+                                                            className='w-full mr-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                                                        >
+                                                            <option value="">{label}</option>
+                                                            {options.map((opt) => (
+                                                                <option key={opt} value={opt}>
+                                                                    {opt}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {hideAdditionalDetails(key)}}
+                                                        >
+                                                            <Trash className='h-5 w-5 text-[#0A66C2] hover:text-white'/>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className='flex relative space-x-3'>
+                                                        <input 
+                                                            type={type}
+                                                            value={personalDetails[key] || ""}
+                                                            onChange={(e) => (updatePersonalDetails({ [key]: e.target.value }))}
+                                                            className='w-full mr-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                                                        />   
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => {hideAdditionalDetails(key)}}
+                                                        >
+                                                            <Trash className='h-5 w-5 text-[#0A66C2] hover:text-white'/>
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <button 
+                                                type='button'
+                                                onClick={() => {showAdditionalDetails(key)}}
+                                                className='w-full px-3 py-2 border border-gray-600 hover:border-indigo-500 hover:text-white rounded-lg transition flex items-center gap-2'
+                                            >
+                                                + Add {label}
+                                            </button>
+                                        )}
+                                    </div>
+                                )
+                            })}
 
                         </div>
                     </div>
@@ -352,111 +449,39 @@ function PersonalDetails() {
 
                         <div className="space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <LinkedinLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.linkedin || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({linkedin: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://linkedin.com/in/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <GithubLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.github || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({github: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://github.com/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <XLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.x || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({x: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://x.com/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <YoutubeLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.youtube || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({youtube: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://www.youtube.com/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <DribbbleLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.socialLinks['dribble'] || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://dribbble.com/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <BehanceLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.linkedin || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({linkedin: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://linkedin.com/in/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <StackOverflowLogoIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.linkedin || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({linkedin: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://linkedin.com/in/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <div className="flex items-center space-x-3">*/}
-                            {/*        <div className="bg-[#0A66C2]/20 rounded-lg p-2">*/}
-                            {/*            <GlobeIcon className="h-5 w-5 text-[#0A66C2]"/>*/}
-                            {/*        </div>*/}
-                            {/*        <input*/}
-                            {/*            type="url"*/}
-                            {/*            value={personalDetails.linkedin || ''}*/}
-                            {/*            onChange={(e) => updatePersonalDetails({linkedin: e.target.value})}*/}
-                            {/*            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"*/}
-                            {/*            placeholder="https://linkedin.com/in/johndoe"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {socialPlatformsList.map(({ platform, icon, key }) => (
-                                <SocialLinkInput
-                                    key={key}
-                                    platform={platform}
-                                    icon={icon}
-                                    value={personalDetails.socialLinks.find((sl) => sl.platform === key) || { url: "", link: "" }}
-                                    onChange={(val) => handleChangeLink(key, val)}
-                                />
-                            ))}
+                            {socialPlatformsList.map(({ platform, icon: Icon, key }) => {
+                                const value = personalDetails.socialLinks.find((sl) => sl.platform === key) || { url: "", link: "" };
+
+                                return (
+                                    <div key={key}>
+                                        {visibleSocialLinks[key] ? (
+                                            <div className='flex'>
+                                                <SocialLinkInput
+                                                    key={key}
+                                                    platform={platform}
+                                                    icon={Icon}
+                                                    value={value}
+                                                    onChange={(val) => handleChangeLink(key, val)}
+                                                />
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => {hideSocialLinks(key)}}
+                                                >
+                                                    <Trash className='h-5 w-5 text-[#0A66C2] hover:text-white'/>
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                type='button'
+                                                onClick={() => {showSocialLinks(key)}}
+                                                className='w-full px-3 py-2 border border-gray-600 hover:border-indigo-500 hover:text-white rounded-lg transition flex items-center gap-2'
+                                            >
+                                                <Icon className="h-5 w-5 z-1 text-[#0A66C2]" />
+                                                + {platform}
+                                            </button>
+                                        )}
+                                    </div>
+                            )})}
                             </div>
                         </div>
                     </div>

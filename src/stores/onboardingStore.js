@@ -17,18 +17,47 @@ export const onboardingStore = create()(
                 maritalStatus: '',
                 militaryService: '',
                 drivingLicense: '',
-                genderPronouns: '',
+                genderPronoun: '',
                 visa: '',
                 socialLinks: [
-                    { platform: 'linkedin', url: '', link: '' },
-                    { platform: 'github', url: '', link: '' },
-                    { platform: 'twitter', url: '', link: '' },
-                    { platform: 'youtube', url: '', link: '' },
-                    { platform: 'dribbble', url: '', link: '' },
-                    { platform: 'behance', url: '', link: '' },
-                    { platform: 'stackoverflow', url: '', link: '' },
-                    { platform: 'website', url: '', link: '' },
+                    // { platform: 'linkedin', url: '', link: '' },
+                    // { platform: 'github', url: '', link: '' },
+                    // { platform: 'twitter', url: '', link: '' },
+                    // { platform: 'youtube', url: '', link: '' },
+                    // { platform: 'dribbble', url: '', link: '' },
+                    // { platform: 'behance', url: '', link: '' },
+                    // { platform: 'stackoverflow', url: '', link: '' },
+                    // { platform: 'website', url: '', link: '' },
                 ],
+            },
+
+            originalData: {
+                personalDetails: {
+                    fullName: '',
+                    jobTitle: '',
+                    email: '',
+                    phone: '',
+                    location: '',
+                    personalInfo: '',
+                    dateOfBirth: '',
+                    nationality: '',
+                    passport_govt_id: '',
+                    maritalStatus: '',
+                    militaryService: '',
+                    drivingLicense: '',
+                    genderPronoun: '',
+                    visa: '',
+                    socialLinks: [
+                        // { platform: 'linkedin', url: '', link: '' },
+                        // { platform: 'github', url: '', link: '' },
+                        // { platform: 'twitter', url: '', link: '' },
+                        // { platform: 'youtube', url: '', link: '' },
+                        // { platform: 'dribbble', url: '', link: '' },
+                        // { platform: 'behance', url: '', link: '' },
+                        // { platform: 'stackoverflow', url: '', link: '' },
+                        // { platform: 'website', url: '', link: '' },
+                    ],
+                },
             },
 
             updatePersonalDetails: (details) => {
@@ -40,21 +69,105 @@ export const onboardingStore = create()(
                 }));
             },
 
+            updateOriginalData: (details) => {
+                set((state) => ({
+                    originalData: {
+                        ...state.originalData,
+                        ...details
+                    }
+                }));
+            },
+
             profilePicture: null,
 
             updateProfilePicture: (file) => {
                 set({ profilePicture: file });
             },
 
-            updateSocialLink: (platform, { url, link }) => {
+            visibleSocialLinks: {},
+
+            showSocialLinks: (platformKey) => {
+                set((state) => {
+                    const existingLink = state.personalDetails.socialLinks.find(
+                        (link) => link.platform === platformKey
+                    );
+
+                    // If platform already exists, just update visibility
+                    const updatedSocialLinks = existingLink
+                        ? state.personalDetails.socialLinks
+                        : [...state.personalDetails.socialLinks, { platform: platformKey, url: '', link: '' }];
+
+                    return {
+                        visibleSocialLinks: {
+                            ...state.visibleSocialLinks,
+                            [platformKey]: true
+                        },
+                        personalDetails: {
+                            ...state.personalDetails,
+                            socialLinks: updatedSocialLinks,
+                        }
+                }
+            });
+            },
+
+            hideSocialLinks: (platformKey) => {
+                set((state) => {
+                    const updatedLinks = state.personalDetails.socialLinks.filter(
+                        (item) => item.platform !== platformKey
+                    );
+
+                    
+                    
+                    return {
+                        visibleSocialLinks: {
+                            ...state.visibleSocialLinks,
+                            [platformKey]: false
+                        },
+                        personalDetails: {
+                            ...state.personalDetails,
+                            socialLinks: updatedLinks
+                        },
+                    }
+                });
+            },
+
+            visibleAdditionalDetails: {},
+
+            showAdditionalDetails: (fieldKey) => {
                 set((state) => ({
+                    visibleAdditionalDetails: {
+                        ...state.visibleAdditionalDetails,
+                        [fieldKey]: true
+                    }
+                }))
+            },
+
+            hideAdditionalDetails: (fieldKey) => {
+                set((state) => ({
+                    visibleAdditionalDetails: {
+                        ...state.visibleAdditionalDetails,
+                        [fieldKey]: false
+                    },
                     personalDetails: {
                         ...state.personalDetails,
-                        socialLinks: state.personalDetails.socialLinks.map((item) =>
-                            item.platform === platform ? { ...item, url, link } : item
-                        )
+                        [fieldKey]: ''
                     }
-                }));
+                }))
+            },
+
+            updateSocialLink: (platform, { url, link }) => {
+                set((state) => {
+                    const updatedLinks = state.personalDetails.socialLinks.map((item) =>
+                        item.platform === platform ? { ...item, url, link } : item
+                    );
+                    
+                    return {
+                        personalDetails: {
+                            ...state.personalDetails,
+                            socialLinks: updatedLinks
+                        },
+                    }
+                });
             },
 
             expandedSections: new Set(),
@@ -84,6 +197,18 @@ export const onboardingStore = create()(
                 }));
             },
 
+            setSaving: (itemId, isSaving) => {
+                set((state) => {
+                    const updatedSet = new Set(state.savingItems);
+                    if (isSaving) {
+                        updatedSet.add(itemId);
+                    } else {
+                        updatedSet.delete(itemId);
+                    }
+                    return { savingItems: updatedSet };
+                });
+            },
+
             markSectionComplete: (sectionId) => {
                 set((state) => ({
                     completedSections: new Set([...state.completedSections, sectionId])
@@ -93,7 +218,11 @@ export const onboardingStore = create()(
         {
             name: "onboarding-storage",
             partialize: (state) => ({
-                completedSections: Array.from(state.completedSections)
+                personalDetails: state.personalDetails,
+                originalData: state.originalData,
+                completedSections: Array.from(state.completedSections),
+                visibleSocialLinks: state.visibleSocialLinks,
+                visibleAdditionalDetails: state.visibleAdditionalDetails,
             }),
             onRehydrateStorage: () => (state) => {
                 if (state) {
@@ -101,6 +230,8 @@ export const onboardingStore = create()(
                     state.expandedSections = new Set();
                     state.editingItems = new Set();
                     state.savingItems = new Set();
+                    state.visibleSocialLinks = state.visibleSocialLinks || {};
+                    state.visibleAdditionalDetails = state.visibleAdditionalDetails || {};
                 }
             }
         }

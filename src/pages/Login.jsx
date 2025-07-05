@@ -1,26 +1,51 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, Linkedin, FileText} from 'lucide-react';
+import { Mail, Lock, Linkedin, FileText, EyeClosed, Eye} from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/operations/authAPI';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); 
+
+  const togglePasswordVisibility = () => setShowPassword(prev => !prev);
+
+  const navigate = useNavigate()
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    // setError(null);
 
     try {
-      // Simulated login delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Login attempted with:', { email, password });
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        toast.error('Please enter a valid email address', {
+                style: {
+                    border: '1px solid #ff0000',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            });
+        return;
+      } else {
+        toast("Logging In...", {
+            icon: '➡️',
+            duration: 5000,
+            style: {
+                border: '1px solid #3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6'
+            }
+        });
+        
+        await login(email, password, navigate);
+        console.log('Login attempted with:', { email, password });
+      }      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -34,6 +59,10 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Toaster 
+        position='bottom-right'
+        reverseOrder={false}
+      />
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
@@ -49,11 +78,11 @@ const Login = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleEmailLogin}>
-          {error && (
+          {/* {error && (
             <div className="bg-red-500/10 border border-red-500/50 text-red-500 rounded-lg p-4 text-sm">
               {error}
             </div>
-          )}
+          )} */}
 
           <div className="space-y-4">
             <div>
@@ -61,13 +90,13 @@ const Login = () => {
                 Email address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute z-1 inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   required
                   value={email}
@@ -83,13 +112,13 @@ const Login = () => {
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute z-1 inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
@@ -97,6 +126,12 @@ const Login = () => {
                   className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-700 rounded-lg bg-gray-900 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="Password"
                 />
+                <div className='absolute z-1 inset-y-0 right-3 pl-3 flex items-center'>
+                    {showPassword ? 
+                    (<Eye className='h-5 w-5 text-gray-400' onClick={togglePasswordVisibility}/>) : 
+                    (<EyeClosed className='h-5 w-5 text-gray-400' onClick={togglePasswordVisibility}/>)
+                    }
+                </div>
               </div>
             </div>
           </div>
@@ -123,10 +158,9 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={loading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            Sign In
           </button>
 
           <div className="relative">

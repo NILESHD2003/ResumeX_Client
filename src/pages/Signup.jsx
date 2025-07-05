@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Linkedin, FileText } from 'lucide-react';
+import { sendMagicLink } from '../services/operations/authAPI';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  // const [error, setError] = useState(null);
+  // const [message, setMessage] = useState(null);
+  const navigate = useNavigate()
 
   const handleMagicLink = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setMessage(null);
+    // setError(null);
+    // setMessage(null);
 
     try {
-      // Simulated magic link delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setMessage('Check your email for the magic link!');
-      console.log('Magic link requested for:', email);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        toast.error('Please enter a valid email address', {
+                style: {
+                    border: '1px solid #ff0000',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            });
+        return;
+      } else {
+        toast("Sending Magic Link...", {
+            icon: '➡️',
+            duration: 5000,
+            style: {
+                border: '1px solid #3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6'
+            }
+        });
+        setTimeout(() => {
+          sendMagicLink(email, navigate)
+        }, 5000)
+        console.log('Magic link requested for:', email);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -36,6 +62,10 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Toaster 
+        position='bottom-right'
+        reverseOrder={false}
+      />
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
@@ -51,30 +81,30 @@ const Signup = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleMagicLink}>
-          {error && (
+          {/* {error && (
             <div className="bg-red-500/10 border border-red-500/50 text-red-500 rounded-lg p-4 text-sm">
               {error}
             </div>
-          )}
+          )} */}
 
-          {message && (
+          {/* {message && (
             <div className="bg-green-500/10 border border-green-500/50 text-green-500 rounded-lg p-4 text-sm">
               {message}
             </div>
-          )}
+          )} */}
 
           <div>
             <label htmlFor="email" className="sr-only">
               Email address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute z-1 inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 id="email"
                 name="email"
-                type="email"
+                type="text"
                 autoComplete="email"
                 required
                 value={email}
