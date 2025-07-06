@@ -94,7 +94,7 @@ function EducationDetails() {
 
     const handleSave = async () => {
         if (!educationForm.degree.trim()) {
-            toast.error("Job Title should not be empty.", {
+            toast.error("Degree should not be empty.", {
                 style: {
                     border: '1px solid orange',
                     backgroundColor: 'rgba(255, 165, 0, 0.1)',
