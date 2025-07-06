@@ -2,6 +2,8 @@ import { authEndpoints } from "../apis";
 import toast from "react-hot-toast";
 import { apiConnector } from "../apiConnector";
 import { useMagicLinkStore } from "../../stores/authStore";
+import { onboardingStore } from "../../stores/onboardingStore";
+import { getProfileDetails } from "./profileDetailsAPI";
 
 const {
     SEND_MAGIC_LINK_API,
@@ -81,8 +83,9 @@ export async function login(email, password, navigate) {
         if (response.data.success) {
             console.log("Successfully logged in");
             const token = response.data.token;
-            const expiry = new Date().getTime() + 604800 * 1000;
+            const expiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
             localStorage.setItem('authToken', JSON.stringify({ token, expiry }));
+            await profileSetup();
             toast.success("Logging In...", {
             duration: 5000,
             style: {
@@ -109,5 +112,22 @@ export async function login(email, password, navigate) {
                 color: '#fb2c36'
             }
         });
+    }
+}
+
+async function profileSetup() {
+    const updatePersonalDetails = onboardingStore.getState().updatePersonalDetails;
+    const updateProfileSummary = onboardingStore.getState().updateProfileSummary;
+
+    try {
+        const data = await getProfileDetails();
+        if (data.personalDetails) {
+            updatePersonalDetails(data.personalDetails);
+        }
+        if (data.profileSummary) {
+            updateProfileSummary(data.profileSummary);
+        }
+    } catch (error) {
+        console.log("Error occured", error);
     }
 }

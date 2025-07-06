@@ -30,6 +30,12 @@ export const onboardingStore = create()(
                     // { platform: 'website', url: '', link: '' },
                 ],
             },
+            
+            profileSummary: "",
+
+            updateProfileSummary: (summary) => {
+                set({ profileSummary: summary });
+            },
 
             originalData: {
                 personalDetails: {
@@ -58,13 +64,18 @@ export const onboardingStore = create()(
                         // { platform: 'website', url: '', link: '' },
                     ],
                 },
+                profileSummary: "",
             },
 
             updatePersonalDetails: (details) => {
                 set((state) => ({
                     personalDetails: {
                         ...state.personalDetails,
-                        ...details
+                        ...details,
+                        socialLinks: (details.socialLinks || []).map((item) => ({
+                            ...item,
+                            link: item.link || '',  // ensure 'link' always exists
+                        })),
                     }
                 }));
             },
@@ -219,6 +230,7 @@ export const onboardingStore = create()(
             name: "onboarding-storage",
             partialize: (state) => ({
                 personalDetails: state.personalDetails,
+                profileSummary: state.profileSummary,
                 originalData: state.originalData,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,

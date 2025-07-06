@@ -4,6 +4,7 @@ import PersonalDetails from "../components/Onboarding/PersonalDetails.jsx";
 import { Toaster } from 'react-hot-toast';
 import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
 import { onboardingStore } from '../stores/onboardingStore.js';
+import ProfileSummary from '../components/Onboarding/ProfileSummary.jsx';
 
 function Onboarding() {
     const {
@@ -46,6 +47,7 @@ function Onboarding() {
                 {/*  Data Sections  */}
                 <div className='space-y-6'>
                     <PersonalDetails></PersonalDetails>
+                    <ProfileSummary></ProfileSummary>
                 </div>
             </div>
         </div>
