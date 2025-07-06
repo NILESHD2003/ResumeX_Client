@@ -118,7 +118,8 @@ export async function login(email, password, navigate) {
 async function profileSetup() {
     const updatePersonalDetails = onboardingStore.getState().updatePersonalDetails;
     const updateProfileSummary = onboardingStore.getState().updateProfileSummary;
-    const addEducationDetails = onboardingStore.getState().addEducationDetail
+    const addEducationDetails = onboardingStore.getState().addEducationDetail;
+    const addProfessionalExps = onboardingStore.getState().addProfessionalExps;
 
     try {
         const data = await getProfileDetails();
@@ -130,6 +131,9 @@ async function profileSetup() {
         }
         if (data.educationDetails) {
             addEducationDetails(data.educationDetails);
+        }
+        if (data.professionalExperience) {
+            addProfessionalExps(data.professionalExperience);
         }
     } catch (error) {
         console.log("Error occured", error);

@@ -6,6 +6,7 @@ import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
 import { onboardingStore } from '../stores/onboardingStore.js';
 import ProfileSummary from '../components/Onboarding/ProfileSummary.jsx';
 import EducationDetails from '../components/Onboarding/EducationDetails.jsx';
+import ProfessionalExperiences from '../components/Onboarding/ProfessionalExperiences.jsx';
 
 function Onboarding() {
     const {
@@ -50,6 +51,7 @@ function Onboarding() {
                     <PersonalDetails></PersonalDetails>
                     <ProfileSummary></ProfileSummary>
                     <EducationDetails></EducationDetails>
+                    <ProfessionalExperiences></ProfessionalExperiences>
                 </div>
             </div>
         </div>

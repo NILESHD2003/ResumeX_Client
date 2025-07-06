@@ -102,6 +102,70 @@ export const onboardingStore = create()(
                 }));
             },
 
+            professionalExperience: [],
+
+            addProfessionalExps: (newEntry) => {
+                set((state) => ({
+                    professionalExperience: [
+                    ...state.professionalExperience,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateProfessionalExps: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.professionalExperience];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { professionalExperience: updatedList };
+                });
+            },
+
+            removeProfessionalExps: (index) => {
+                set((state) => {
+                    const updatedList = [...state.professionalExperience];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { professionalExperience: updatedList };
+                });
+            },
+
+            professionalExpForm: {
+                jobTitle: '',
+                employer: '',
+                link: '',
+                country: '',
+                city: '',
+                startDate: '',
+                endDate: '',
+                description: '',
+                hide: false
+            },
+
+            professionalExpEditingIndex: null,
+
+            updateProfessionalExpEditingIndex: (index) => {
+                set({professionalExpEditingIndex: index})
+            },
+
+            addProfessionalExp: false,
+
+            updateAddProfessionalExp: (index) => {
+                set({addProfessionalExp: index})
+            },
+
+            updateProfessionalExpForm: (details) => {
+                set((state) => ({
+                    professionalExpForm: {
+                        ...state.professionalExpForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -131,6 +195,7 @@ export const onboardingStore = create()(
                 },
                 profileSummary: "",
                 educationDetails: [],
+                professionalExperience: []
             },
 
             updatePersonalDetails: (details) => {
@@ -302,6 +367,10 @@ export const onboardingStore = create()(
                 educationForm: state.educationForm,
                 educationEditingIndex: state.educationEditingIndex,
                 addEducation: state.addEducation,
+                professionalExperience: state.professionalExperience,
+                professionalExpForm: state.professionalExpForm,
+                professionalExpEditingIndex: state.professionalExpEditingIndex,
+                addProfessionalExp: state.addProfessionalExp,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
