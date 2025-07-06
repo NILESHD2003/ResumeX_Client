@@ -260,7 +260,7 @@ function ProfessionalExpForm({data, editor, handleSave, handleChange, profession
               {professionalExpEditingIndex !== null ? 'Update Professional Experience' : 'Add Professional Experience'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-1">
+                <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                         Job Title
                     </label>
@@ -272,7 +272,7 @@ function ProfessionalExpForm({data, editor, handleSave, handleChange, profession
                         onChange={(e) => handleChange({ jobTitle: e.target.value})}
                     />
                 </div>
-                <div className="md:col-span-1">
+                <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                         Employer
                     </label>
