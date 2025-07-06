@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
 import { onboardingStore } from '../stores/onboardingStore.js';
 import ProfileSummary from '../components/Onboarding/ProfileSummary.jsx';
+import EducationDetails from '../components/Onboarding/EducationDetails.jsx';
 
 function Onboarding() {
     const {
@@ -48,6 +49,7 @@ function Onboarding() {
                 <div className='space-y-6'>
                     <PersonalDetails></PersonalDetails>
                     <ProfileSummary></ProfileSummary>
+                    <EducationDetails></EducationDetails>
                 </div>
             </div>
         </div>

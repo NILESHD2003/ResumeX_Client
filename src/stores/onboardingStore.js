@@ -37,6 +37,71 @@ export const onboardingStore = create()(
                 set({ profileSummary: summary });
             },
 
+            educationDetails: [],
+
+            addEducationDetail: (newEntry) => {
+                set((state) => ({
+                    educationDetails: [
+                    ...state.educationDetails,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateEducationDetail: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.educationDetails];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { educationDetails: updatedList };
+                });
+            },
+
+            removeEducationDetail: (index) => {
+                set((state) => {
+                    const updatedList = [...state.educationDetails];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { educationDetails: updatedList };
+                });
+            },
+
+            educationForm: {
+                degree: '',
+                grade: '',
+                school: '',
+                link: '',
+                country: '',
+                city: '',
+                startDate: '',
+                endDate: '',
+                description: '',
+                hide: false
+            },
+
+            educationEditingIndex: null,
+
+            updateEducationEditingIndex: (index) => {
+                set({educationEditingIndex: index})
+            },
+
+            addEducation: false,
+
+            updateAddEducation: (index) => {
+                set({addEducation: index})
+            },
+
+            updateEducationForm: (details) => {
+                set((state) => ({
+                    educationForm: {
+                        ...state.educationForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -65,6 +130,7 @@ export const onboardingStore = create()(
                     ],
                 },
                 profileSummary: "",
+                educationDetails: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -196,16 +262,16 @@ export const onboardingStore = create()(
                 });
             },
 
-            startEditing: (itemId) => {
-                set((state) => ({
-                    editingItems: new Set([...state.editingItems, itemId])
-                }));
-            },
-
-            stopEditing: (itemId) => {
-                set((state) => ({
-                    editingItems: new Set([...state.editingItems].filter((id) => id !== itemId))
-                }));
+            setEditing: (itemId, isEditing) => {
+                set((state) => {
+                    const updatedSet = new Set(state.editingItems);
+                    if (isEditing) {
+                        updatedSet.add(itemId);
+                    } else {
+                        updatedSet.delete(itemId);
+                    }
+                    return { editingItems: updatedSet };
+                });
             },
 
             setSaving: (itemId, isSaving) => {
@@ -232,6 +298,10 @@ export const onboardingStore = create()(
                 personalDetails: state.personalDetails,
                 profileSummary: state.profileSummary,
                 originalData: state.originalData,
+                educationDetails: state.educationDetails,
+                educationForm: state.educationForm,
+                educationEditingIndex: state.educationEditingIndex,
+                addEducation: state.addEducation,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
