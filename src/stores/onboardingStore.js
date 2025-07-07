@@ -532,6 +532,69 @@ export const onboardingStore = create()(
                 }));
             },
 
+            organizations: [],
+
+            addOrganizations: (newEntry) => {
+                set((state) => ({
+                    organizations: [
+                    ...state.organizations,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateOrganizations: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.organizations];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { organizations: updatedList };
+                });
+            },
+
+            removeOrganizations: (index) => {
+                set((state) => {
+                    const updatedList = [...state.organizations];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { organizations: updatedList };
+                });
+            },
+
+            organizationForm: {
+                name: '',
+                link: '',
+                country: '',
+                city: '',
+                startDate: '',
+                endDate: '',
+                description: '',
+                hide: false
+            },
+
+            organizationsEditingIndex: null,
+
+            updateOrganizationsEditingIndex: (index) => {
+                set({organizationsEditingIndex: index})
+            },
+
+            addOrganization: false,
+
+            updateAddOrganization: (index) => {
+                set({addOrganization: index})
+            },
+
+            updateOrganizationForm: (details) => {
+                set((state) => ({
+                    organizationForm: {
+                        ...state.organizationForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -568,6 +631,7 @@ export const onboardingStore = create()(
                 projects: [],
                 awards: [],
                 courses: [],
+                organizations: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -767,6 +831,10 @@ export const onboardingStore = create()(
                 courseForm: state.courseForm,
                 coursesEditingIndex: state.coursesEditingIndex,
                 addCourse: state.addCourse,
+                organizations: state.organizations,
+                organizationForm: state.organizationForm,
+                organizationsEditingIndex: state.organizationsEditingIndex,
+                addOrganization: state.addOrganization,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,

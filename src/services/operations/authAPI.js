@@ -126,6 +126,7 @@ async function profileSetup() {
     const addProjects = onboardingStore.getState().addProjects;
     const addAwards = onboardingStore.getState().addAwards;
     const addCourses = onboardingStore.getState().addCourses;
+    const addOrganizations = onboardingStore.getState().addOrganizations;
 
     try {
         const data = await getProfileDetails();
@@ -158,6 +159,9 @@ async function profileSetup() {
         }
         if (data.courses) {
             addCourses(data.courses);
+        }
+        if (data.organizations) {
+            addOrganizations(data.organizations);
         }
     } catch (error) {
         console.log("Error occured", error);
