@@ -166,6 +166,65 @@ export const onboardingStore = create()(
                 }));
             },
 
+            skills: [],
+
+            addSkills: (newEntry) => {
+                set((state) => ({
+                    skills: [
+                    ...state.skills,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateSkills: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.skills];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { skills: updatedList };
+                });
+            },
+
+            removeSkills: (index) => {
+                set((state) => {
+                    const updatedList = [...state.skills];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { skills: updatedList };
+                });
+            },
+
+            skillForm: {
+                name: "",
+                subSkills: [],
+                level: "",
+                hide: false,
+            },
+
+            skillsEditingIndex: null,
+
+            updateSkillsEditingIndex: (index) => {
+                set({skillsEditingIndex: index})
+            },
+
+            addSkill: false,
+
+            updateAddSkill: (index) => {
+                set({addSkill: index})
+            },
+
+            updateSkillForm: (details) => {
+                set((state) => ({
+                    skillForm: {
+                        ...state.skillForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -371,6 +430,10 @@ export const onboardingStore = create()(
                 professionalExpForm: state.professionalExpForm,
                 professionalExpEditingIndex: state.professionalExpEditingIndex,
                 addProfessionalExp: state.addProfessionalExp,
+                skills: state.skills,
+                skillForm: state.skillForm,
+                skillsEditingIndex: state.skillsEditingIndex,
+                addSkill: state.addSkill,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
