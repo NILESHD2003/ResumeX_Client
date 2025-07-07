@@ -469,6 +469,69 @@ export const onboardingStore = create()(
                 }));
             },
 
+            courses: [],
+
+            addCourses: (newEntry) => {
+                set((state) => ({
+                    courses: [
+                    ...state.courses,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateCourses: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.courses];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { courses: updatedList };
+                });
+            },
+
+            removeCourses: (index) => {
+                set((state) => {
+                    const updatedList = [...state.courses];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { courses: updatedList };
+                });
+            },
+
+            courseForm: {
+                title: '',
+                link: '',
+                license: '',
+                issuer: '',
+                date: '',
+                expirationDate: '',
+                additionalInfo: '',
+                hide: false
+            },
+
+            coursesEditingIndex: null,
+
+            updateCoursesEditingIndex: (index) => {
+                set({coursesEditingIndex: index})
+            },
+
+            addCourse: false,
+
+            updateAddCourse: (index) => {
+                set({addCourse: index})
+            },
+
+            updateCourseForm: (details) => {
+                set((state) => ({
+                    courseForm: {
+                        ...state.courseForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -504,6 +567,7 @@ export const onboardingStore = create()(
                 certificates: [],
                 projects: [],
                 awards: [],
+                courses: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -699,6 +763,10 @@ export const onboardingStore = create()(
                 awardForm: state.awardForm,
                 awardsEditingIndex: state.awardsEditingIndex,
                 addAward: state.addAward,
+                courses: state.courses,
+                courseForm: state.courseForm,
+                coursesEditingIndex: state.coursesEditingIndex,
+                addCourse: state.addCourse,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
