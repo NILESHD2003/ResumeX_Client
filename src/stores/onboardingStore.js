@@ -595,6 +595,67 @@ export const onboardingStore = create()(
                 }));
             },
 
+            publications: [],
+
+            addPublications: (newEntry) => {
+                set((state) => ({
+                    publications: [
+                    ...state.publications,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updatePublications: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.publications];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { publications: updatedList };
+                });
+            },
+
+            removePublications: (index) => {
+                set((state) => {
+                    const updatedList = [...state.publications];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { publications: updatedList };
+                });
+            },
+
+            publicationForm: {
+                title: "",
+                link: "",
+                publisher: "",
+                date: "",
+                description: "",
+                hide: false,
+            },
+
+            publicationsEditingIndex: null,
+
+            updatePublicationsEditingIndex: (index) => {
+                set({publicationsEditingIndex: index})
+            },
+
+            addPublication: false,
+
+            updateAddPublication: (index) => {
+                set({addPublication: index})
+            },
+
+            updatePublicationForm: (details) => {
+                set((state) => ({
+                    publicationForm: {
+                        ...state.publicationForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -632,6 +693,7 @@ export const onboardingStore = create()(
                 awards: [],
                 courses: [],
                 organizations: [],
+                publications: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -835,6 +897,10 @@ export const onboardingStore = create()(
                 organizationForm: state.organizationForm,
                 organizationsEditingIndex: state.organizationsEditingIndex,
                 addOrganization: state.addOrganization,
+                publications: state.publications,
+                publicationForm: state.publicationForm,
+                publicationsEditingIndex: state.publicationsEditingIndex,
+                addPublication: state.addPublication,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
