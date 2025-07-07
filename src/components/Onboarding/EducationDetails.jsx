@@ -379,6 +379,9 @@ function EducationForm({data, editor, handleSave, handleChange, educationEditing
                     />
                 </div>
                 <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Description
+                    </label>
                     <MenuBar editor={editor} />
                     <div className="relative tipTapWrapper border border-gray-700 rounded-md bg-gray-800 text-white min-h-[124px] max-h-[1274px] overflow-auto">
                         <EditorContent

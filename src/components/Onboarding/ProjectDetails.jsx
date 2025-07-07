@@ -346,7 +346,7 @@ function ProjectForm({data, editor, handleSave, handleChange, projectsEditingInd
                         type="text"
                         value={data.title ?? ''}
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="Cloud Project"
+                        placeholder="Title"
                         onChange={(e) => handleChange({ title: e.target.value})}
                     />
                 </div>
@@ -358,7 +358,7 @@ function ProjectForm({data, editor, handleSave, handleChange, projectsEditingInd
                         type="text"
                         value={data.subtitle ?? ''}
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="issuer.com\project"
+                        placeholder="Subtitle"
                         onChange={(e) => handleChange({ subtitle: e.target.value})}
                     />
                 </div>
