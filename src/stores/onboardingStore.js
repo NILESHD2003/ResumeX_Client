@@ -347,6 +347,68 @@ export const onboardingStore = create()(
                 }));
             },
 
+            projects: [],
+
+            addProjects: (newEntry) => {
+                set((state) => ({
+                    projects: [
+                    ...state.projects,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateProjects: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.projects];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { projects: updatedList };
+                });
+            },
+
+            removeProjects: (index) => {
+                set((state) => {
+                    const updatedList = [...state.projects];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { projects: updatedList };
+                });
+            },
+
+            projectForm: {
+                title: '',
+                subtitle: '',
+                description: '',
+                startDate: '',
+                endDate: '',
+                links: [],
+                hide: false,
+            },
+
+            projectsEditingIndex: null,
+
+            updateProjectsEditingIndex: (index) => {
+                set({projectsEditingIndex: index})
+            },
+
+            addProject: false,
+
+            updateAddProject: (index) => {
+                set({addProject: index})
+            },
+
+            updateProjectForm: (details) => {
+                set((state) => ({
+                    projectForm: {
+                        ...state.projectForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -379,7 +441,8 @@ export const onboardingStore = create()(
                 professionalExperience: [],
                 skills: [],
                 languages: [],
-                certificates: []
+                certificates: [],
+                projects: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -562,11 +625,15 @@ export const onboardingStore = create()(
                 languages: state.languages,
                 languageForm: state.languageForm,
                 languagesEditingIndex: state.languagesEditingIndex,
-                addCertificate: state.addCertificate,
+                addLanguage: state.addLanguage,
                 certificates: state.certificates,
                 certificateForm: state.certificateForm,
                 certificatesEditingIndex: state.certificatesEditingIndex,
-                addLanguage: state.addLanguage,
+                addCertificate: state.addCertificate,
+                projects: state.projects,
+                projectForm: state.projectForm,
+                projectsEditingIndex: state.projectsEditingIndex,
+                addProject: state.addProject,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
