@@ -41,12 +41,16 @@ function SkillDetails() {
             Object.entries(newData).filter(([key, value]) => {
                 const originalValue = originalData[key];
 
-                // Deep compare for arrays of primitives
+                // Handle arrays of primitives (deep compare)
                 if (Array.isArray(value) && Array.isArray(originalValue)) {
                     return JSON.stringify(value) !== JSON.stringify(originalValue);
                 }
 
-                return originalValue !== value;
+                // Normalize null, undefined, and empty strings
+                const normalizedOriginal = (originalValue ?? '').toString().trim();
+                const normalizedNew = (value ?? '').toString().trim();
+
+                return normalizedOriginal !== normalizedNew;
             })
         );
     }

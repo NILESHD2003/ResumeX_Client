@@ -71,21 +71,27 @@ function EducationDetails() {
     function getChangedFields(newData, originalData) {
         return Object.fromEntries(
             Object.entries(newData).filter(([key, value]) => {
-            if (key === 'startDate' || key === 'endDate') {
-                const originalDate = originalData[key]
-                ? new Date(originalData[key]).toISOString().split('T')[0]
-                : '';
-                const newDate = value
-                ? new Date(value).toISOString().split('T')[0]
-                : '';
-                return originalDate !== newDate;
-            }
+                const originalValue = originalData[key];
 
-            if (key === 'description') {
-                return (originalData[key] || '').trim() !== (value || '').trim();
-            }
+                if (key === 'startDate' || key === 'endDate') {
+                    const originalDate = originalValue
+                        ? new Date(originalValue).toISOString().split('T')[0]
+                        : '';
+                    const newDate = value
+                        ? new Date(value).toISOString().split('T')[0]
+                        : '';
+                    return originalDate !== newDate;
+                }
 
-            return originalData[key] !== value;
+                if (key === 'description') {
+                    const normalizedOriginal = (originalValue ?? '').toString().trim();
+                    const normalizedNew = (value ?? '').toString().trim();
+                    return normalizedOriginal !== normalizedNew;
+                }
+
+                const normalizedOriginal = (originalValue ?? '').toString().trim();
+                const normalizedNew = (value ?? '').toString().trim();
+                return normalizedOriginal !== normalizedNew;
             })
         );
     }
@@ -204,6 +210,18 @@ function EducationDetails() {
         }
     }
 
+    React.useEffect(() => {
+        if (!editor) return;
+
+        const formContent = educationForm.description || "<p>Write your summary...</p>";
+        const editorContent = editor.getHTML();
+
+        // Only set content if it's actually different
+        if (formContent.trim() !== editorContent.trim()) {
+            editor.commands.setContent(formContent);
+        }
+    }, [educationForm.description, editor]);
+
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden max-w-4xl">
             <SectionHeader 
@@ -304,7 +322,7 @@ function EducationForm({data, editor, handleSave, handleChange, educationEditing
                 </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Link
+                        Relevant Link
                     </label>
                     <input 
                         type="text"
@@ -365,7 +383,7 @@ function EducationForm({data, editor, handleSave, handleChange, educationEditing
                     <div className="relative tipTapWrapper border border-gray-700 rounded-md bg-gray-800 text-white min-h-[124px] max-h-[1274px] overflow-auto">
                         <EditorContent
                         editor={editor}
-                        className="tiptap list-disc list-inside"
+                        className="tiptap list-disc list-inside whitespace-pre-wrap break-words"
                         />
                     </div>
                 </div>
