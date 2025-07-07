@@ -225,6 +225,65 @@ export const onboardingStore = create()(
                 }));
             },
 
+            languages: [],
+
+            addLanguages: (newEntry) => {
+                set((state) => ({
+                    languages: [
+                    ...state.languages,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateLanguages: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.languages];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { languages: updatedList };
+                });
+            },
+
+            removeLanguages: (index) => {
+                set((state) => {
+                    const updatedList = [...state.languages];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { languages: updatedList };
+                });
+            },
+
+            languageForm: {
+                name: "",
+                additionalInfo: "",
+                level: "",
+                hide: false,
+            },
+
+            languagesEditingIndex: null,
+
+            updateLanguagesEditingIndex: (index) => {
+                set({languagesEditingIndex: index})
+            },
+
+            addLanguage: false,
+
+            updateAddLanguage: (index) => {
+                set({addLanguage: index})
+            },
+
+            updateLanguageForm: (details) => {
+                set((state) => ({
+                    languageForm: {
+                        ...state.languageForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -254,7 +313,9 @@ export const onboardingStore = create()(
                 },
                 profileSummary: "",
                 educationDetails: [],
-                professionalExperience: []
+                professionalExperience: [],
+                skills: [],
+                languages: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -434,6 +495,10 @@ export const onboardingStore = create()(
                 skillForm: state.skillForm,
                 skillsEditingIndex: state.skillsEditingIndex,
                 addSkill: state.addSkill,
+                languages: state.languages,
+                languageForm: state.languageForm,
+                languagesEditingIndex: state.languagesEditingIndex,
+                addLanguage: state.addLanguage,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
