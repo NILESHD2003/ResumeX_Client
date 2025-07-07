@@ -409,6 +409,66 @@ export const onboardingStore = create()(
                 }));
             },
 
+            awards: [],
+
+            addAwards: (newEntry) => {
+                set((state) => ({
+                    awards: [
+                    ...state.awards,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateAwards: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.awards];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { awards: updatedList };
+                });
+            },
+
+            removeAwards: (index) => {
+                set((state) => {
+                    const updatedList = [...state.awards];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { awards: updatedList };
+                });
+            },
+
+            awardForm: {
+                title: "",
+                link: "",
+                issuer: "",
+                date: "",
+                hide: false,
+            },
+
+            awardsEditingIndex: null,
+
+            updateAwardsEditingIndex: (index) => {
+                set({awardsEditingIndex: index})
+            },
+
+            addAward: false,
+
+            updateAddAward: (index) => {
+                set({addAward: index})
+            },
+
+            updateAwardForm: (details) => {
+                set((state) => ({
+                    awardForm: {
+                        ...state.awardForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -443,6 +503,7 @@ export const onboardingStore = create()(
                 languages: [],
                 certificates: [],
                 projects: [],
+                awards: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -634,6 +695,10 @@ export const onboardingStore = create()(
                 projectForm: state.projectForm,
                 projectsEditingIndex: state.projectsEditingIndex,
                 addProject: state.addProject,
+                awards: state.awards,
+                awardForm: state.awardForm,
+                awardsEditingIndex: state.awardsEditingIndex,
+                addAward: state.addAward,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
