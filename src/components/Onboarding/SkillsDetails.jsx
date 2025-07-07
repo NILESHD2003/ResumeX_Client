@@ -157,7 +157,7 @@ function SkillDetails() {
             {isExpanded && (
                 <>
                     {(skills.length === 0 || skillsEditingIndex !== null || addSkill) && (
-                        <ProfessionalExpForm 
+                        <SkillForm 
                             data={skillForm}
                             handleSave={handleSave}
                             handleChange={updateSkillForm}
@@ -198,7 +198,7 @@ function SkillDetails() {
     )
 }
 
-function ProfessionalExpForm({data, handleSave, handleChange, skillsEditingIndex, addSkill, handleCancel}) {
+function SkillForm({data, handleSave, handleChange, skillsEditingIndex, addSkill, handleCancel}) {
     const [subSkillInput, setSubSkillInput] = useState("");
 
     const handleSubSkillKeyDown = (e) => {

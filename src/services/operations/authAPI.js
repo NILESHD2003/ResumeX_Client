@@ -122,6 +122,7 @@ async function profileSetup() {
     const addProfessionalExps = onboardingStore.getState().addProfessionalExps;
     const addSkills = onboardingStore.getState().addSkills;
     const addLanguages = onboardingStore.getState().addLanguages;
+    const addCertificates = onboardingStore.getState().addCertificates;
 
     try {
         const data = await getProfileDetails();
@@ -139,8 +140,12 @@ async function profileSetup() {
         }
         if (data.skills) {
             addSkills(data.skills);
-        }if (data.languages) {
+        }
+        if (data.languages) {
             addLanguages(data.languages);
+        }
+        if (data.certificates) {
+            addCertificates(data.certificates);
         }
     } catch (error) {
         console.log("Error occured", error);

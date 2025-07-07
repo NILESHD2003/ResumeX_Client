@@ -284,6 +284,69 @@ export const onboardingStore = create()(
                 }));
             },
 
+            certificates: [],
+
+            addCertificates: (newEntry) => {
+                set((state) => ({
+                    certificates: [
+                    ...state.certificates,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateCertificates: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.certificates];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { certificates: updatedList };
+                });
+            },
+
+            removeCertificates: (index) => {
+                set((state) => {
+                    const updatedList = [...state.certificates];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { certificates: updatedList };
+                });
+            },
+
+            certificateForm: {
+                title: '',
+                link: '',
+                license: '',
+                issuer: '',
+                date: '',
+                expirationDate: '',
+                additionalInfo: '',
+                hide: false
+            },
+
+            certificatesEditingIndex: null,
+
+            updateCertificatesEditingIndex: (index) => {
+                set({certificatesEditingIndex: index})
+            },
+
+            addCertificate: false,
+
+            updateAddCertificate: (index) => {
+                set({addCertificate: index})
+            },
+
+            updateCertificateForm: (details) => {
+                set((state) => ({
+                    certificateForm: {
+                        ...state.certificateForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -316,6 +379,7 @@ export const onboardingStore = create()(
                 professionalExperience: [],
                 skills: [],
                 languages: [],
+                certificates: []
             },
 
             updatePersonalDetails: (details) => {
@@ -498,6 +562,10 @@ export const onboardingStore = create()(
                 languages: state.languages,
                 languageForm: state.languageForm,
                 languagesEditingIndex: state.languagesEditingIndex,
+                addCertificate: state.addCertificate,
+                certificates: state.certificates,
+                certificateForm: state.certificateForm,
+                certificatesEditingIndex: state.certificatesEditingIndex,
                 addLanguage: state.addLanguage,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,

@@ -202,7 +202,7 @@ function LanguagesDetails() {
             {isExpanded && (
                 <>
                     {(languages.length === 0 || languagesEditingIndex !== null || addLanguage) && (
-                        <ProfessionalExpForm 
+                        <LanguageForm 
                             data={languageForm}
                             editor={editor}
                             handleSave={handleSave}
@@ -244,7 +244,7 @@ function LanguagesDetails() {
     )
 }
 
-function ProfessionalExpForm({data, editor, handleSave, handleChange, languagesEditingIndex, addLanguage, handleCancel}) {
+function LanguageForm({data, editor, handleSave, handleChange, languagesEditingIndex, addLanguage, handleCancel}) {
     return (
         <div className="p-6 border-t border-gray-800 space-y-6 w-full">
             <h2 className="text-xl font-semibold">

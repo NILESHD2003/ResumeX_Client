@@ -9,6 +9,7 @@ import EducationDetails from '../components/Onboarding/EducationDetails.jsx';
 import ProfessionalExperiences from '../components/Onboarding/ProfessionalExperiences.jsx';
 import SkillDetails from '../components/Onboarding/SkillsDetails.jsx';
 import LanguagesDetails from '../components/Onboarding/LanguagesDetails.jsx';
+import CertificationDetails from '../components/Onboarding/CertificationDetails.jsx';
 
 function Onboarding() {
     const {
@@ -56,6 +57,7 @@ function Onboarding() {
                     <ProfessionalExperiences></ProfessionalExperiences>
                     <SkillDetails></SkillDetails>
                     <LanguagesDetails></LanguagesDetails>
+                    <CertificationDetails></CertificationDetails>
                 </div>
             </div>
         </div>
