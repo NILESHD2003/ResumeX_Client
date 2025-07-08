@@ -7,6 +7,8 @@ import {CameraIcon, UserIcon, LinkedinLogoIcon, GithubLogoIcon, XLogoIcon, Youtu
 import { Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { patchPersonalDetails } from '../../services/operations/personalDetailsAPI.js';
+import { patchProfileImage, deleteProfileImage } from '../../services/operations/ProfileImageAPI.js';
+import ImageCropperModal from './ImageCropperModal.jsx';
 
 function PersonalDetails() {
     const {
@@ -26,12 +28,47 @@ function PersonalDetails() {
         updateProfilePicture,
     } = onboardingStore();
     const isExpanded = expandedSections.has('personal');
+    const [cropFile, setCropFile] = React.useState(null);
 
-    const handleImageUpload = () => {
-        // TODO: Handle profile picture upload later where make a call to the backend to upload the image and then save the URL in the store.
+    const handleImageUpload = (e) => {
+        const file = e.target.files?.[0];
 
-        // Use the updateProfilePicture method to save the uploaded image URL to the store
-    }
+        e.target.value = "";
+        if (!file || !file.type.startsWith("image/")) {
+            toast.error("Failed to upload image", {
+                style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            });
+            return;
+        }
+        setCropFile(file);
+    };
+
+    const handleCroppedImageSave = async (blob) => {
+        const formData = new FormData();
+        formData.append("image", blob);
+
+        try {
+            const response = await patchProfileImage(formData);
+            if (response) {
+                updateProfilePicture(response);
+            }
+        } catch (err) {
+            toast.error("Failed to upload image", {
+                style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            });
+        } finally {
+            setCropFile(null);
+        }
+    };
+
 
     const handleSave = async () => {
         const updatedPayload = {}
@@ -141,9 +178,6 @@ function PersonalDetails() {
         }
 
     }
-
-    const [pronoun, setPronoun] = React.useState('Select your pronoun');
-    const [maritalStatus, setMaritalStatus] = React.useState('Select your status');
 
     const socialPlatformsList = [
         { platform: "LinkedIn", icon: LinkedinLogoIcon, key: "LinkedIn" },
@@ -269,7 +303,8 @@ function PersonalDetails() {
                     <div className="flex items-center space-x-4">
                         <div className="relative">
                             <div
-                                className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center overflow-hidden"
+                            >
                                 {profilePicture ? (
                                     <img
                                         src={profilePicture}
@@ -277,14 +312,36 @@ function PersonalDetails() {
                                         className="w-full h-full rounded-full object-cover"
                                     />
                                 ) : (
-                                    <UserIcon className="h-8 w-8 text-white"/>
+                                    <UserIcon className="h-8 w-8 text-white" />
                                 )}
                             </div>
-                            <button
-                                className="absolute -bottom-1 -right-1 bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 transition-colors"
-                                onClick={handleImageUpload}>
-                                <CameraIcon weight='duotone' className="h-4 w-4 text-white"/>
-                            </button>
+
+                            {/* Clickable upload icon */}
+                            <label
+                                htmlFor="profile-upload"
+                                className="absolute -bottom-1 -right-1 bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 transition-colors cursor-pointer"
+                            >
+                                <CameraIcon weight="duotone" className="h-4 w-4 text-white" />
+                            </label>
+                                {profilePicture && (
+                                    <button
+                                        onClick={async () => {
+                                            await deleteProfileImage();
+                                            updateProfilePicture(null);
+                                            updateOriginalData({profilePicture: null});
+                                        }}
+                                        className="absolute -bottom-1 -left-1 bg-red-600 hover:bg-red-700 rounded-full p-2 transition-colors"
+                                    >
+                                        <Trash className="h-4 w-4 text-white" />
+                                    </button>
+                                )}
+                            <input
+                                id="profile-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                            />
                         </div>
                         <div>
                             <h4 className="font-medium text-white">Profile Picture</h4>
@@ -490,6 +547,13 @@ function PersonalDetails() {
                         <SaveButton itemId="personal" onSave={handleSave}/>
                     </div>
                 </div>
+            )}
+            {cropFile && (
+                <ImageCropperModal
+                    file={cropFile}
+                    onCancel={() => setCropFile(null)}
+                    onSave={handleCroppedImageSave}
+                />
             )}
         </div>
     );

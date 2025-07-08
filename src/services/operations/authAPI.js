@@ -117,6 +117,7 @@ export async function login(email, password, navigate) {
 
 async function profileSetup() {
     const updatePersonalDetails = onboardingStore.getState().updatePersonalDetails;
+    const updateProfilePicture = onboardingStore.getState().updateProfilePicture;
     const updateProfileSummary = onboardingStore.getState().updateProfileSummary;
     const addEducationDetails = onboardingStore.getState().addEducationDetail;
     const addProfessionalExps = onboardingStore.getState().addProfessionalExps;
@@ -133,6 +134,9 @@ async function profileSetup() {
         const data = await getProfileDetails();
         if (data.personalDetails) {
             updatePersonalDetails(data.personalDetails);
+        }
+        if (data.profilePicture) {
+            updateProfilePicture(data.profilePicture);
         }
         if (data.profileSummary) {
             updateProfileSummary(data.profileSummary);

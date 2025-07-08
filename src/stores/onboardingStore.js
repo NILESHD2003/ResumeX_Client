@@ -745,6 +745,7 @@ export const onboardingStore = create()(
                         // { platform: 'website', url: '', link: '' },
                     ],
                 },
+                profilePicture: null,
                 profileSummary: "",
                 educationDetails: [],
                 professionalExperience: [],
@@ -923,6 +924,7 @@ export const onboardingStore = create()(
             partialize: (state) => ({
                 personalDetails: state.personalDetails,
                 profileSummary: state.profileSummary,
+                profilePicture: state.profilePicture,
                 originalData: state.originalData,
                 educationDetails: state.educationDetails,
                 educationForm: state.educationForm,
