@@ -16,6 +16,7 @@ import CourseDetails from '../components/Onboarding/CourseDetails.jsx';
 import OrganizationDetails from '../components/Onboarding/OrganizationDetails.jsx';
 import PublicationDetails from '../components/Onboarding/PublicationDetails.jsx';
 import ReferencesDetails from '../components/Onboarding/ReferencesDetails.jsx';
+import DeclarationDetails from '../components/Onboarding/DeclarationDetail.jsx';
 
 function Onboarding() {
     const {
@@ -70,6 +71,7 @@ function Onboarding() {
                     <OrganizationDetails></OrganizationDetails>
                     <PublicationDetails></PublicationDetails>
                     <ReferencesDetails></ReferencesDetails>
+                    <DeclarationDetails></DeclarationDetails>
                 </div>
             </div>
         </div>

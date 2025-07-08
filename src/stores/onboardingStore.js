@@ -718,6 +718,24 @@ export const onboardingStore = create()(
                 }));
             },
 
+            declaration: {
+                text: "",
+                fullName: "",
+                signature: null,
+                place: "",
+                date: "",
+                hide: false
+            },
+
+            updateDeclaration: (details) => {
+                set((state) => ({
+                    declaration: {
+                        ...state.declaration,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -758,6 +776,14 @@ export const onboardingStore = create()(
                 organizations: [],
                 publications: [],
                 references: [],
+                declaration: {
+                    text: "",
+                    fullName: "",
+                    signature: null,
+                    place: "",
+                    date: "",
+                    hide: false
+                },
             },
 
             updatePersonalDetails: (details) => {
@@ -970,6 +996,7 @@ export const onboardingStore = create()(
                 referenceForm: state.referenceForm,
                 referencesEditingIndex: state.referencesEditingIndex,
                 addReference: state.addReference,
+                declaration: state.declaration,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,

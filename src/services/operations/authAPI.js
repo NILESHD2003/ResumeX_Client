@@ -129,6 +129,7 @@ async function profileSetup() {
     const addCourses = onboardingStore.getState().addCourses;
     const addOrganizations = onboardingStore.getState().addOrganizations;
     const addReferences = onboardingStore.getState().addReferences;
+    const updateDeclaration = onboardingStore.getState().updateDeclaration;
 
     try {
         const data = await getProfileDetails();
@@ -170,6 +171,9 @@ async function profileSetup() {
         }
         if (data.references) {
             addReferences(data.references);
+        }
+        if (data.declaration) {
+            updateDeclaration(data.declaration);
         }
     } catch (error) {
         console.log("Error occured", error);
