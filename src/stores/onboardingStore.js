@@ -656,6 +656,68 @@ export const onboardingStore = create()(
                 }));
             },
 
+            references: [],
+
+            addReferences: (newEntry) => {
+                set((state) => ({
+                    references: [
+                    ...state.references,
+                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                    ],
+                }));
+            },
+
+            updateReferences: (index, updatedData) => {
+                set((state) => {
+                    const updatedList = [...state.references];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList[index] = { ...updatedList[index], ...updatedData };
+                    }
+                    return { references: updatedList };
+                });
+            },
+
+            removeReferences: (index) => {
+                set((state) => {
+                    const updatedList = [...state.references];
+                    if (index >= 0 && index < updatedList.length) {
+                        updatedList.splice(index, 1); // Remove the item at the specified index
+                    }
+                    return { references: updatedList };
+                });
+            },
+
+            referenceForm: {
+                name: "",
+                link: "",
+                jobTitle: "",
+                organization: "",
+                email: "",
+                phone: "",
+                hide: false,
+            },
+
+            referencesEditingIndex: null,
+
+            updateReferencesEditingIndex: (index) => {
+                set({referencesEditingIndex: index})
+            },
+
+            addReference: false,
+
+            updateAddReference: (index) => {
+                set({addReference: index})
+            },
+
+            updateReferenceForm: (details) => {
+                set((state) => ({
+                    referenceForm: {
+                        ...state.referenceForm,
+                        ...details
+                    }
+                }));
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
@@ -694,6 +756,7 @@ export const onboardingStore = create()(
                 courses: [],
                 organizations: [],
                 publications: [],
+                references: [],
             },
 
             updatePersonalDetails: (details) => {
@@ -901,6 +964,10 @@ export const onboardingStore = create()(
                 publicationForm: state.publicationForm,
                 publicationsEditingIndex: state.publicationsEditingIndex,
                 addPublication: state.addPublication,
+                references: state.references,
+                referenceForm: state.referenceForm,
+                referencesEditingIndex: state.referencesEditingIndex,
+                addReference: state.addReference,
                 completedSections: Array.from(state.completedSections),
                 visibleSocialLinks: state.visibleSocialLinks,
                 visibleAdditionalDetails: state.visibleAdditionalDetails,
