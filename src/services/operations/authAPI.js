@@ -2,6 +2,8 @@ import { authEndpoints } from "../apis";
 import toast from "react-hot-toast";
 import { apiConnector } from "../apiConnector";
 import { useMagicLinkStore } from "../../stores/authStore";
+import { onboardingStore } from "../../stores/onboardingStore";
+import { getProfileDetails } from "./profileDetailsAPI";
 
 const {
     SEND_MAGIC_LINK_API,
@@ -81,8 +83,9 @@ export async function login(email, password, navigate) {
         if (response.data.success) {
             console.log("Successfully logged in");
             const token = response.data.token;
-            const expiry = new Date().getTime() + 604800 * 1000;
+            const expiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
             localStorage.setItem('authToken', JSON.stringify({ token, expiry }));
+            await profileSetup();
             toast.success("Logging In...", {
             duration: 5000,
             style: {
@@ -109,5 +112,70 @@ export async function login(email, password, navigate) {
                 color: '#fb2c36'
             }
         });
+    }
+}
+
+async function profileSetup() {
+    const updatePersonalDetails = onboardingStore.getState().updatePersonalDetails;
+    const updateProfilePicture = onboardingStore.getState().updateProfilePicture;
+    const updateProfileSummary = onboardingStore.getState().updateProfileSummary;
+    const addEducationDetails = onboardingStore.getState().addEducationDetail;
+    const addProfessionalExps = onboardingStore.getState().addProfessionalExps;
+    const addSkills = onboardingStore.getState().addSkills;
+    const addLanguages = onboardingStore.getState().addLanguages;
+    const addCertificates = onboardingStore.getState().addCertificates;
+    const addProjects = onboardingStore.getState().addProjects;
+    const addAwards = onboardingStore.getState().addAwards;
+    const addCourses = onboardingStore.getState().addCourses;
+    const addOrganizations = onboardingStore.getState().addOrganizations;
+    const addReferences = onboardingStore.getState().addReferences;
+    const updateDeclaration = onboardingStore.getState().updateDeclaration;
+
+    try {
+        const data = await getProfileDetails();
+        if (data.personalDetails) {
+            updatePersonalDetails(data.personalDetails);
+        }
+        if (data.profilePicture) {
+            updateProfilePicture(data.profilePicture);
+        }
+        if (data.profileSummary) {
+            updateProfileSummary(data.profileSummary);
+        }
+        if (data.educationDetails) {
+            addEducationDetails(data.educationDetails);
+        }
+        if (data.professionalExperience) {
+            addProfessionalExps(data.professionalExperience);
+        }
+        if (data.skills) {
+            addSkills(data.skills);
+        }
+        if (data.languages) {
+            addLanguages(data.languages);
+        }
+        if (data.certificates) {
+            addCertificates(data.certificates);
+        }
+        if (data.projects) {
+            addProjects(data.projects);
+        }
+        if (data.awards) {
+            addAwards(data.awards);
+        }
+        if (data.courses) {
+            addCourses(data.courses);
+        }
+        if (data.organizations) {
+            addOrganizations(data.organizations);
+        }
+        if (data.references) {
+            addReferences(data.references);
+        }
+        if (data.declaration) {
+            updateDeclaration(data.declaration);
+        }
+    } catch (error) {
+        console.log("Error occured", error);
     }
 }

@@ -4,6 +4,19 @@ import PersonalDetails from "../components/Onboarding/PersonalDetails.jsx";
 import { Toaster } from 'react-hot-toast';
 import { getProfileDetails } from '../services/operations/profileDetailsAPI.js';
 import { onboardingStore } from '../stores/onboardingStore.js';
+import ProfileSummary from '../components/Onboarding/ProfileSummary.jsx';
+import EducationDetails from '../components/Onboarding/EducationDetails.jsx';
+import ProfessionalExperiences from '../components/Onboarding/ProfessionalExperiences.jsx';
+import SkillDetails from '../components/Onboarding/SkillsDetails.jsx';
+import LanguagesDetails from '../components/Onboarding/LanguagesDetails.jsx';
+import CertificationDetails from '../components/Onboarding/CertificationDetails.jsx';
+import ProjectDetails from '../components/Onboarding/ProjectDetails.jsx';
+import AwardDetails from '../components/Onboarding/AwardDetails.jsx';
+import CourseDetails from '../components/Onboarding/CourseDetails.jsx';
+import OrganizationDetails from '../components/Onboarding/OrganizationDetails.jsx';
+import PublicationDetails from '../components/Onboarding/PublicationDetails.jsx';
+import ReferencesDetails from '../components/Onboarding/ReferencesDetails.jsx';
+import DeclarationDetails from '../components/Onboarding/DeclarationDetail.jsx';
 
 function Onboarding() {
     const {
@@ -46,6 +59,19 @@ function Onboarding() {
                 {/*  Data Sections  */}
                 <div className='space-y-6'>
                     <PersonalDetails></PersonalDetails>
+                    <ProfileSummary></ProfileSummary>
+                    <EducationDetails></EducationDetails>
+                    <ProfessionalExperiences></ProfessionalExperiences>
+                    <SkillDetails></SkillDetails>
+                    <LanguagesDetails></LanguagesDetails>
+                    <CertificationDetails></CertificationDetails>
+                    <ProjectDetails></ProjectDetails>
+                    <AwardDetails></AwardDetails>
+                    <CourseDetails></CourseDetails>
+                    <OrganizationDetails></OrganizationDetails>
+                    <PublicationDetails></PublicationDetails>
+                    <ReferencesDetails></ReferencesDetails>
+                    <DeclarationDetails></DeclarationDetails>
                 </div>
             </div>
         </div>

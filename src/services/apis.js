@@ -29,7 +29,8 @@ export const profileSummaryEndpoints = {
 export const profileImageEndpoints = {
     GET_USER_PROFILE_IMAGE: BASE_URL + "/profile/image",
     UPDATE_USER_PROFILE_IMAGE: BASE_URL + "/profile/image",
-    TOGGLE_USER_PROFILE_IMAGE_VISIBILITY: BASE_URL + "/profile/image",
+    DELETE_USER_PROFILE_IMAGE: BASE_URL + "/profile/image",
+    TOGGLE_USER_PROFILE_IMAGE_VISIBILITY: BASE_URL + "/profile/image/toggle-visibility",
 }
 
 // EDUCATIONAL DETAILS ENDPOINTS
