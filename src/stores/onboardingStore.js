@@ -30,7 +30,7 @@ export const onboardingStore = create()(
                     // { platform: 'website', url: '', link: '' },
                 ],
             },
-            
+
             profileSummary: "",
 
             updateProfileSummary: (summary) => {
@@ -42,8 +42,8 @@ export const onboardingStore = create()(
             addEducationDetail: (newEntry) => {
                 set((state) => ({
                     educationDetails: [
-                    ...state.educationDetails,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.educationDetails,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -84,13 +84,13 @@ export const onboardingStore = create()(
             educationEditingIndex: null,
 
             updateEducationEditingIndex: (index) => {
-                set({educationEditingIndex: index})
+                set({ educationEditingIndex: index })
             },
 
             addEducation: false,
 
             updateAddEducation: (index) => {
-                set({addEducation: index})
+                set({ addEducation: index })
             },
 
             updateEducationForm: (details) => {
@@ -107,8 +107,8 @@ export const onboardingStore = create()(
             addProfessionalExps: (newEntry) => {
                 set((state) => ({
                     professionalExperience: [
-                    ...state.professionalExperience,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.professionalExperience,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -148,13 +148,13 @@ export const onboardingStore = create()(
             professionalExpEditingIndex: null,
 
             updateProfessionalExpEditingIndex: (index) => {
-                set({professionalExpEditingIndex: index})
+                set({ professionalExpEditingIndex: index })
             },
 
             addProfessionalExp: false,
 
             updateAddProfessionalExp: (index) => {
-                set({addProfessionalExp: index})
+                set({ addProfessionalExp: index })
             },
 
             updateProfessionalExpForm: (details) => {
@@ -171,8 +171,8 @@ export const onboardingStore = create()(
             addSkills: (newEntry) => {
                 set((state) => ({
                     skills: [
-                    ...state.skills,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.skills,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -207,13 +207,13 @@ export const onboardingStore = create()(
             skillsEditingIndex: null,
 
             updateSkillsEditingIndex: (index) => {
-                set({skillsEditingIndex: index})
+                set({ skillsEditingIndex: index })
             },
 
             addSkill: false,
 
             updateAddSkill: (index) => {
-                set({addSkill: index})
+                set({ addSkill: index })
             },
 
             updateSkillForm: (details) => {
@@ -230,8 +230,8 @@ export const onboardingStore = create()(
             addLanguages: (newEntry) => {
                 set((state) => ({
                     languages: [
-                    ...state.languages,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.languages,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -266,13 +266,13 @@ export const onboardingStore = create()(
             languagesEditingIndex: null,
 
             updateLanguagesEditingIndex: (index) => {
-                set({languagesEditingIndex: index})
+                set({ languagesEditingIndex: index })
             },
 
             addLanguage: false,
 
             updateAddLanguage: (index) => {
-                set({addLanguage: index})
+                set({ addLanguage: index })
             },
 
             updateLanguageForm: (details) => {
@@ -289,8 +289,8 @@ export const onboardingStore = create()(
             addCertificates: (newEntry) => {
                 set((state) => ({
                     certificates: [
-                    ...state.certificates,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.certificates,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -329,13 +329,13 @@ export const onboardingStore = create()(
             certificatesEditingIndex: null,
 
             updateCertificatesEditingIndex: (index) => {
-                set({certificatesEditingIndex: index})
+                set({ certificatesEditingIndex: index })
             },
 
             addCertificate: false,
 
             updateAddCertificate: (index) => {
-                set({addCertificate: index})
+                set({ addCertificate: index })
             },
 
             updateCertificateForm: (details) => {
@@ -352,8 +352,8 @@ export const onboardingStore = create()(
             addProjects: (newEntry) => {
                 set((state) => ({
                     projects: [
-                    ...state.projects,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.projects,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -391,13 +391,13 @@ export const onboardingStore = create()(
             projectsEditingIndex: null,
 
             updateProjectsEditingIndex: (index) => {
-                set({projectsEditingIndex: index})
+                set({ projectsEditingIndex: index })
             },
 
             addProject: false,
 
             updateAddProject: (index) => {
-                set({addProject: index})
+                set({ addProject: index })
             },
 
             updateProjectForm: (details) => {
@@ -414,8 +414,8 @@ export const onboardingStore = create()(
             addAwards: (newEntry) => {
                 set((state) => ({
                     awards: [
-                    ...state.awards,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.awards,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -451,13 +451,13 @@ export const onboardingStore = create()(
             awardsEditingIndex: null,
 
             updateAwardsEditingIndex: (index) => {
-                set({awardsEditingIndex: index})
+                set({ awardsEditingIndex: index })
             },
 
             addAward: false,
 
             updateAddAward: (index) => {
-                set({addAward: index})
+                set({ addAward: index })
             },
 
             updateAwardForm: (details) => {
@@ -474,8 +474,8 @@ export const onboardingStore = create()(
             addCourses: (newEntry) => {
                 set((state) => ({
                     courses: [
-                    ...state.courses,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.courses,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -514,13 +514,13 @@ export const onboardingStore = create()(
             coursesEditingIndex: null,
 
             updateCoursesEditingIndex: (index) => {
-                set({coursesEditingIndex: index})
+                set({ coursesEditingIndex: index })
             },
 
             addCourse: false,
 
             updateAddCourse: (index) => {
-                set({addCourse: index})
+                set({ addCourse: index })
             },
 
             updateCourseForm: (details) => {
@@ -537,8 +537,8 @@ export const onboardingStore = create()(
             addOrganizations: (newEntry) => {
                 set((state) => ({
                     organizations: [
-                    ...state.organizations,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.organizations,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -577,13 +577,13 @@ export const onboardingStore = create()(
             organizationsEditingIndex: null,
 
             updateOrganizationsEditingIndex: (index) => {
-                set({organizationsEditingIndex: index})
+                set({ organizationsEditingIndex: index })
             },
 
             addOrganization: false,
 
             updateAddOrganization: (index) => {
-                set({addOrganization: index})
+                set({ addOrganization: index })
             },
 
             updateOrganizationForm: (details) => {
@@ -600,8 +600,8 @@ export const onboardingStore = create()(
             addPublications: (newEntry) => {
                 set((state) => ({
                     publications: [
-                    ...state.publications,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.publications,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -638,13 +638,13 @@ export const onboardingStore = create()(
             publicationsEditingIndex: null,
 
             updatePublicationsEditingIndex: (index) => {
-                set({publicationsEditingIndex: index})
+                set({ publicationsEditingIndex: index })
             },
 
             addPublication: false,
 
             updateAddPublication: (index) => {
-                set({addPublication: index})
+                set({ addPublication: index })
             },
 
             updatePublicationForm: (details) => {
@@ -661,8 +661,8 @@ export const onboardingStore = create()(
             addReferences: (newEntry) => {
                 set((state) => ({
                     references: [
-                    ...state.references,
-                    ...(Array.isArray(newEntry) ? newEntry : [newEntry])
+                        ...state.references,
+                        ...(Array.isArray(newEntry) ? newEntry : [newEntry])
                     ],
                 }));
             },
@@ -700,13 +700,13 @@ export const onboardingStore = create()(
             referencesEditingIndex: null,
 
             updateReferencesEditingIndex: (index) => {
-                set({referencesEditingIndex: index})
+                set({ referencesEditingIndex: index })
             },
 
             addReference: false,
 
             updateAddReference: (index) => {
-                set({addReference: index})
+                set({ addReference: index })
             },
 
             updateReferenceForm: (details) => {
@@ -816,28 +816,37 @@ export const onboardingStore = create()(
 
             visibleSocialLinks: {},
 
-            showSocialLinks: (platformKey) => {
+            showSocialLinks: (platformInput) => {
                 set((state) => {
-                    const existingLink = state.personalDetails.socialLinks.find(
-                        (link) => link.platform === platformKey
-                    );
+                    const updates = {};
+                    const updatedSocialLinks = [...state.personalDetails.socialLinks];
 
-                    // If platform already exists, just update visibility
-                    const updatedSocialLinks = existingLink
-                        ? state.personalDetails.socialLinks
-                        : [...state.personalDetails.socialLinks, { platform: platformKey, url: '', link: '' }];
+                    const addPlatform = (platformKey) => {
+                        updates[platformKey] = true;
+
+                        const exists = updatedSocialLinks.some((link) => link.platform === platformKey);
+                        if (!exists) {
+                            updatedSocialLinks.push({ platform: platformKey, url: '', link: '' });
+                        }
+                    };
+
+                    if (typeof platformInput === 'string') {
+                        addPlatform(platformInput);
+                    } else if (typeof platformInput === 'object' && platformInput !== null) {
+                        Object.keys(platformInput).forEach(addPlatform);
+                    }
 
                     return {
                         visibleSocialLinks: {
                             ...state.visibleSocialLinks,
-                            [platformKey]: true
+                            ...updates,
                         },
                         personalDetails: {
                             ...state.personalDetails,
                             socialLinks: updatedSocialLinks,
-                        }
-                }
-            });
+                        },
+                    };
+                });
             },
 
             hideSocialLinks: (platformKey) => {
@@ -846,8 +855,8 @@ export const onboardingStore = create()(
                         (item) => item.platform !== platformKey
                     );
 
-                    
-                    
+
+
                     return {
                         visibleSocialLinks: {
                             ...state.visibleSocialLinks,
@@ -863,13 +872,27 @@ export const onboardingStore = create()(
 
             visibleAdditionalDetails: {},
 
-            showAdditionalDetails: (fieldKey) => {
-                set((state) => ({
-                    visibleAdditionalDetails: {
-                        ...state.visibleAdditionalDetails,
-                        [fieldKey]: true
+            showAdditionalDetails: (fieldInput) => {
+                set((state) => {
+                    const updates = {};
+
+                    const addField = (key) => {
+                        updates[key] = true;
+                    };
+
+                    if (typeof fieldInput === 'string') {
+                        addField(fieldInput);
+                    } else if (typeof fieldInput === 'object' && fieldInput !== null) {
+                        Object.keys(fieldInput).forEach(addField);
                     }
-                }))
+
+                    return {
+                        visibleAdditionalDetails: {
+                            ...state.visibleAdditionalDetails,
+                            ...updates,
+                        },
+                    };
+                });
             },
 
             hideAdditionalDetails: (fieldKey) => {
@@ -890,7 +913,7 @@ export const onboardingStore = create()(
                     const updatedLinks = state.personalDetails.socialLinks.map((item) =>
                         item.platform === platform ? { ...item, url, link } : item
                     );
-                    
+
                     return {
                         personalDetails: {
                             ...state.personalDetails,
@@ -998,8 +1021,6 @@ export const onboardingStore = create()(
                 addReference: state.addReference,
                 declaration: state.declaration,
                 completedSections: Array.from(state.completedSections),
-                visibleSocialLinks: state.visibleSocialLinks,
-                visibleAdditionalDetails: state.visibleAdditionalDetails,
             }),
             onRehydrateStorage: () => (state) => {
                 if (state) {

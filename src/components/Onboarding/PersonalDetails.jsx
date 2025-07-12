@@ -104,7 +104,6 @@ function PersonalDetails() {
                 updatedPayload[key] = personalDetails[key];
             }
         });
-        console.log(updatedPayload);
 
         const originalDate = originalData.personalDetails.dateOfBirth
             ? new Date(originalData.personalDetails.dateOfBirth).toISOString().split("T")[0]
@@ -126,6 +125,24 @@ function PersonalDetails() {
                     return false;
                 }
             };
+
+            const invalidLinks = links.filter(
+                (link) =>
+                    typeof link.url === "string" &&
+                    link.url.trim() !== "" &&
+                    !isValidUrl(link.url.trim())
+            );
+
+            if (invalidLinks.length > 0) {
+                toast.error("One or more social links are invalid URLs.", {
+                    style: {
+                        border: '1px solid orange',
+                        backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                        color: 'orange'
+                    }
+                });
+                return; // return early
+            }
 
             return links
                 .filter(
@@ -158,6 +175,7 @@ function PersonalDetails() {
         if (linksChanged) {
             updatedPayload.socialLinks = currentLinks;
         }
+        console.log(currentLinks);
 
         if (Object.keys(updatedPayload).length === 0) {
             toast("No Changes to Save", {
@@ -205,6 +223,7 @@ function PersonalDetails() {
     function SocialLinkInput({ platform, icon: Icon, value, onChange }) {
         const [isDialogOpen, setDialogOpen] = React.useState(false);
         const [tempLink, setTempLink] = React.useState(value.link || "");
+        const [tempUrl, setTempUrl] = React.useState(value.url || "");
 
         const openDialog = () => {
             setTempLink(value.link || "");
@@ -214,6 +233,16 @@ function PersonalDetails() {
         const saveLink = () => {
             onChange({ ...value, link: tempLink });
             setDialogOpen(false);
+        };
+
+        const handleUrlChange = (url) => {
+            setTempUrl(url)
+        }
+
+        const handleBlur = () => {
+            if (tempUrl !== value.url) {
+                onChange({ ...value, url: tempUrl });
+            }
         };
 
         return (
@@ -226,8 +255,9 @@ function PersonalDetails() {
                 {/* Input field */}
                 <input
                     type="text"
-                    value={value.url || ""}
-                    onChange={(e) => onChange({ ...value, url: e.target.value })}
+                    value={tempUrl}
+                    onChange={(e) => handleUrlChange(e.target.value)}
+                    onBlur={handleBlur}
                     placeholder={`Enter your ${platform} username or handle`}
                     className="pl-10 pr-10 flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
@@ -288,6 +318,66 @@ function PersonalDetails() {
     const handleChangeLink = (key, newValue) => {
         updateSocialLink(key, newValue); // expects { url, link }
     };
+
+    const updateRefresh = () => {
+        try {
+            const originalPersonalDetails = { ...originalData.personalDetails };
+            if (originalPersonalDetails.dateOfBirth) {
+                const date = new Date(originalPersonalDetails.dateOfBirth);
+                if (!isNaN(date)) {
+                    originalPersonalDetails.dateOfBirth = date.toISOString().split("T")[0];
+                } else {
+                    originalPersonalDetails.dateOfBirth = "";
+                }
+            }
+            updatePersonalDetails(originalPersonalDetails);
+
+            // Show all original social links
+            const socialVisibilityMap = {};
+            (originalPersonalDetails.socialLinks || []).forEach((link) => {
+                if (link.platform?.trim()) {
+                    socialVisibilityMap[link.platform.trim()] = true;
+                }
+            });
+            showSocialLinks(socialVisibilityMap);
+
+            // Show all additional detail fields with values
+            const additionalVisibilityMap = {};
+            const additionalDetailKeys = [
+                "dateOfBirth",
+                "nationality",
+                "genderPronoun",
+                "maritalStatus",
+                "passport_govt_id",
+                "drivingLicense",
+                "militaryService",
+                "visa",
+            ];
+
+            additionalDetailKeys.forEach((key) => {
+                const value = originalPersonalDetails[key];
+
+                // Special case for dateOfBirth
+                if (
+                    key === "dateOfBirth"
+                        ? !!value && !isNaN(new Date(value).getTime())
+                        : value !== null && value !== undefined && value !== ""
+                ) {
+                    additionalVisibilityMap[key] = true;
+                }
+            });
+
+            showAdditionalDetails(additionalVisibilityMap);
+
+        } catch (error) {
+            console.log("Error occurred", error);
+        }
+    };
+
+
+    React.useEffect(() => {
+        updateRefresh();
+    }, [])
 
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden max-w-4xl">
@@ -472,7 +562,14 @@ function PersonalDetails() {
                                                         <input 
                                                             type={type}
                                                             value={personalDetails[key] || ""}
-                                                            onChange={(e) => (updatePersonalDetails({ [key]: e.target.value }))}
+                                                            onChange={(e) => {
+                                                                const inputValue = e.target.value;
+                                                                updatePersonalDetails({
+                                                                    [key]: key === "dateOfBirth"
+                                                                        ? inputValue ? new Date(inputValue) : new Date("") // empty date instance
+                                                                        : inputValue
+                                                                });
+                                                            }}
                                                             className='w-full mr-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
                                                         />   
                                                         <button 
