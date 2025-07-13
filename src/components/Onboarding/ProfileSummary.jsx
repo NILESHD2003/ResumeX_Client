@@ -78,6 +78,12 @@ function ProfileSummary() {
         }
     }
 
+    React.useEffect(() => {
+        if (editor && originalData.profileSummary !== undefined) {
+            editor.commands.setContent(originalData.profileSummary || "<p>Write your summary...</p>");
+        }
+    }, [editor, originalData.profileSummary]);
+
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden max-w-4xl">
             <SectionHeader 
