@@ -1,6 +1,7 @@
 import React from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {FileText, X, Menu, Crown, LogOut, User, ChevronDown, ChevronUp, Settings} from 'lucide-react'
+import { onboardingStore } from '../../stores/onboardingStore';
 
 function Navbar() {
     const [isScrolled, setIsScrolled] = React.useState(false);
@@ -8,7 +9,7 @@ function Navbar() {
     const location = useLocation();
     const isAuthPage = ['/login', '/signup', '/create-account'].includes(location.pathname);
     const isOnboardingPage = location.pathname.startsWith('/onboarding');
-    const isLoggedIn = ['/dashboard', '/onboarding', '/generate/resume', '/generate/cover-letter'].includes(location.pathname);
+    const isLoggedIn = ['/dashboard', '/onboarding', '/generate/resume', '/generate/cover-letter', '/resume-editor'].includes(location.pathname);
 
     React.useEffect(() => {
         const handleWindowScroll = () => {
@@ -19,6 +20,10 @@ function Navbar() {
 
         return (() => window.removeEventListener("scroll", handleWindowScroll));
     });
+
+    const {
+        originalData
+    } = onboardingStore();
 
     if (isAuthPage) return null;
 
@@ -34,13 +39,15 @@ function Navbar() {
         setIsMenuOpen(!isMenuOpen);
     }
 
+
+
     // Profile Dropdown Menu JSX (only for desktop dropdown, not mobile)
     const ProfileDropdownMenu = (
         <div
             className="bg-gray-900 absolute right-0 mt-2 w-64 rounded-lg shadow-lg flex flex-col space-y-4 z-50 p-4 border-gray-600 border">
             <div className='space-x-2 px-4 py-1'>
-                <h2 className='font-bold text-lg'>John Doe</h2>
-                <h4 className='text-base text-gray-400'>john.doe@example.com</h4>
+                <h2 className='font-bold text-lg'>{originalData.name}</h2>
+                <h4 className='text-base text-gray-400'>{originalData.email}</h4>
             </div>
             <hr className='text-gray-400'></hr>
             <div className='flex items-center space-x-2 px-4 py-1 cursor-pointer hover:bg-gray-800 rounded'>

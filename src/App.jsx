@@ -13,6 +13,7 @@ import Footer from './components/LandingPage/Footer.jsx'
 import Dashboard from "./pages/Dashboard.jsx";
 import GenerateResume from "./pages/GenerateResume.jsx";
 import Onboarding from "./pages/Onboarding.jsx";
+import ResumeEditor from './pages/ResumeEditor.jsx'
 import CreateAccount from './pages/CreateAccount.jsx'
 import { useNavigate, useLocation } from 'react-router-dom'
 import ProtectedRoute from './components/shared/ProtectedRoute.jsx'
@@ -78,6 +79,12 @@ function App() {
                 <Route path='/generate/resume' element={
                     <ProtectedRoute>
                         <GenerateResume />
+                    </ProtectedRoute>
+                } />
+
+                <Route path='/resume-editor' element={
+                    <ProtectedRoute>
+                        <ResumeEditor />
                     </ProtectedRoute>
                 } />
 
