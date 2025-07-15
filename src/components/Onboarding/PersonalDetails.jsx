@@ -26,6 +26,9 @@ function PersonalDetails() {
         hideAdditionalDetails,
         profilePicture,
         updateProfilePicture,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
     const isExpanded = expandedSections.has('personal');
     const [cropFile, setCropFile] = React.useState(null);
@@ -191,6 +194,7 @@ function PersonalDetails() {
         try {
             await patchPersonalDetails(updatedPayload);
             updateOriginalData({personalDetails: personalDetails});
+            await markSectionComplete("personal");
         } catch (error) {
             console.error("Update failed", error)
         }
@@ -211,11 +215,11 @@ function PersonalDetails() {
     const additionaDetailsFields = [
         {key: "dateOfBirth", label: "Date of Birth", type: "date" },
         {key: "nationality", label: "Nationality", type: "text" },
-        {key: "genderPronoun", label: "Gender Pronoun", type: "text" },
-        {key: "maritalStatus", label: "Marital Status", type: "select", options: ["He/Him", "She/Her", "They/Them", "Prefer Not to Say"] },
-        {key: "passport_govt_id", label: "Passport / Govermnent ID", type: "select", options: ["Single", "Married", "Divorced", "Widowed", "Separated", "In a relationship / Partnered", "Prefer Not to Say"] },
+        {key: "genderPronoun", label: "Gender Pronoun", type: "select", options: ["He/Him", "She/Her", "They/Them", "Prefer Not to Say"] },
+        {key: "maritalStatus", label: "Marital Status", type: "select", options: ["Single", "Married", "Divorced", "Widowed", "Separated", "In a relationship / Partnered", "Prefer Not to Say"] },
+        {key: "passport_govt_id", label: "Passport / Govermnent ID", type: "text", },
         {key: "drivingLicense", label: "Driving License", type: "text" },
-        {key: "militaryService", label: "Military Service", type: "text" },
+        {key: "militaryService", label: "Military Service", type: "select", options: ["Currently Serving", "Veteran", "Reserved"] },
         {key: "visa", label: "Visa", type: "text" },
     ]
 
@@ -533,9 +537,6 @@ function PersonalDetails() {
                                     <div key={key}>
                                         {visible ? (
                                             <>
-                                                <label className='block text-sm font-medium text-gray-300 mb-2'>
-                                                    {label}
-                                                </label>
                                                 {type === "select" ? (
                                                     <div className='flex'>
                                                         <select
@@ -570,6 +571,7 @@ function PersonalDetails() {
                                                                         : inputValue
                                                                 });
                                                             }}
+                                                            placeholder={label}
                                                             className='w-full mr-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
                                                         />   
                                                         <button 

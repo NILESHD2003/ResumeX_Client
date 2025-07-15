@@ -29,7 +29,7 @@ function App() {
 
             const { expiry } = JSON.parse(tokenData);
             if (Date.now() > expiry) {
-                localStorage.removeItem('authToken');
+                localStorage.clear();
                 if (location.pathname !== '/login') {
                     navigate('/login');
                 }

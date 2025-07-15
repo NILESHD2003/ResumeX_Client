@@ -21,7 +21,10 @@ function SkillDetails() {
         updateSkillsEditingIndex,
         addSkill,
         updateAddSkill,
-        removeSkills
+        removeSkills,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const isExpanded = expandedSections.has("skills");
@@ -76,6 +79,7 @@ function SkillDetails() {
                     await addSkills(newSkills);
                     const updatedSkills = onboardingStore.getState().skills;
                     await updateOriginalData({skills: updatedSkills});
+                    await markSectionComplete("skills");
                 }          
             } else {
                 const original = skills[skillsEditingIndex]
@@ -141,6 +145,10 @@ function SkillDetails() {
         try {
             await deleteSkillDetail(skills[index]._id);
             removeSkills(index);
+            const updatedSkills = onboardingStore.getState().skills;
+            if (updatedSkills.length === 0 && completedSections.has("skills")) {
+                await removeSectionComplete("skills");
+            }
         } catch (error) {
             
         }

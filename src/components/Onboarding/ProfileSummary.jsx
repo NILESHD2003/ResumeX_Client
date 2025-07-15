@@ -22,7 +22,10 @@ function ProfileSummary() {
         updateProfileSummary,
         originalData,
         updateOriginalData,
-        expandedSections
+        expandedSections,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const isExpanded = expandedSections.has("profileSummary");
@@ -73,6 +76,7 @@ function ProfileSummary() {
         try {
             await patchProfileSummaryDetails(profileSummary);
             updateOriginalData({profileSummary: profileSummary});
+            await markSectionComplete("profileSummary");
         } catch (error) {
             console.error("Update failed", error);
         }

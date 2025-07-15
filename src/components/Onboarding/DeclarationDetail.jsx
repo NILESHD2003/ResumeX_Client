@@ -7,14 +7,17 @@ import toast from 'react-hot-toast';
 import { Trash } from 'lucide-react';
 import ImageCropperModal from './ImageCropperModal.jsx';
 import { patchDeclarationDetail, patchDeclarationSignatureImage, deleteDeclarationSignatureImage } from '../../services/operations/declarationDetailsAPI.js';
-
+ 
 function DeclarationDetails() {
     const {
         expandedSections,
         declaration,
         updateDeclaration,
         originalData,
-        updateOriginalData
+        updateOriginalData,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
     const [cropFile, setCropFile] = React.useState(null);
 
@@ -34,6 +37,28 @@ function DeclarationDetails() {
         setCropFile(file);
     };
 
+    const defaultDeclaration = {
+        text: "",
+        fullName: "",
+        signature: null,
+        place: "",
+        date: "",
+        hide: false
+    };
+
+    function isDeclarationEmpty(currentDeclaration) {
+        return Object.entries(defaultDeclaration).every(([key, defaultValue]) => {
+            const currentValue = currentDeclaration[key];
+
+            if (key === "date") {
+                const dateStr = currentValue ? new Date(currentValue).toISOString().split("T")[0] : "";
+                return dateStr === "";
+            }
+
+            return (currentValue ?? "").toString().trim() === (defaultValue ?? "").toString().trim();
+        });
+    }
+
     const handleCroppedSave = async (blob) => {
         const formData = new FormData();
         formData.append("signature", blob);
@@ -45,6 +70,7 @@ function DeclarationDetails() {
                 updateOriginalData({
                     declaration: { ...declaration, signature: res },
                 });
+                await markSectionComplete("declaration");
             }
         } catch (err) {
             toast.error("Failed to upload image", {
@@ -66,6 +92,10 @@ function DeclarationDetails() {
             updateOriginalData({
                 declaration: { ...declaration, signature: null },
             });
+            const updatedOriginalData = onboardingStore.getState().originalData;
+            if (isDeclarationEmpty(updatedOriginalData.declaration)) {
+                await removeSectionComplete("declaration");
+            }
         } catch (err) {
             toast.error("Failed to delete signature");
         }
@@ -111,6 +141,12 @@ function DeclarationDetails() {
 
             await patchDeclarationDetail(updatedPayload);
             updateOriginalData({ declaration: declaration });
+            const updatedOriginalData = onboardingStore.getState().originalData;
+            if (isDeclarationEmpty(updatedOriginalData.declaration)) {
+                await removeSectionComplete("declaration");
+            } else {
+                await markSectionComplete("declaration");
+            }
         } catch (error) {
             toast.error("Failed to save declaration");
             console.error("Declaration save error:", error);

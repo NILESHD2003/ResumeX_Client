@@ -31,7 +31,10 @@ function OrganizationDetails() {
         updateOrganizationsEditingIndex,
         addOrganization,
         updateAddOrganization,
-        removeOrganizations
+        removeOrganizations,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -117,9 +120,7 @@ function OrganizationDetails() {
                     await addOrganizations(newOrganization);
                     const updatedOrganization = onboardingStore.getState().organizations;
                     await updateOriginalData({organizations: updatedOrganization});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("organizations");
                 }          
             } else {
                 const original = organizations[organizationsEditingIndex]
@@ -197,6 +198,10 @@ function OrganizationDetails() {
         try {
             await deleteOrganizationDetail(organizations[index]._id);
             removeOrganizations(index);
+            const updatedOrganization = onboardingStore.getState().organizations;
+            if (updatedOrganization.length === 0 && completedSections.has("organizations")) {
+                await removeSectionComplete("organizations");
+            }
         } catch (error) {
             
         }

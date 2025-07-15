@@ -26,6 +26,7 @@ function Navbar() {
         // Handle logout logic here
         console.log('Logout clicked');
         // Redirect to home page or login page
+        localStorage.clear();
         window.location.href = '/';
     };
 
@@ -75,22 +76,31 @@ function Navbar() {
                                         <span className="text-sm font-medium">Upgrade to PRO</span>
                                     </button>
                                     <div className="relative">
-                                        <button className='' onClick={handleNavMenu}>{isMenuOpen ? isLoggedIn ? <button
-                                            className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors">
-                                            <div
-                                                className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                                <User className="h-5 w-5 text-white"/>
-                                            </div>
-                                            <ChevronUp className={`h-4 w-4 text-gray-400 transition-transform`}/>
-                                        </button> : <X size={24}></X> : isLoggedIn ? <button
-                                            className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors"
-                                        >
-                                            <div
-                                                className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                                <User className="h-5 w-5 text-white"/>
-                                            </div>
-                                            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform`}/>
-                                        </button> : <Menu size={24}></Menu>}</button>
+                                        <button className='' onClick={handleNavMenu}>
+                                            {isMenuOpen ? (
+                                                isLoggedIn ? (
+                                                <span className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-white" />
+                                                    </div>
+                                                    <ChevronUp className="h-4 w-4 text-gray-400 transition-transform" />
+                                                </span>
+                                                ) : (
+                                                <X size={24} />
+                                                )
+                                            ) : (
+                                                isLoggedIn ? (
+                                                <span className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-white" />
+                                                    </div>
+                                                    <ChevronDown className="h-4 w-4 text-gray-400 transition-transform" />
+                                                </span>
+                                                ) : (
+                                                <Menu size={24} />
+                                                )
+                                            )}
+                                        </button>
                                         {/* Desktop Profile Dropdown - only for desktop */}
                                         {isMenuOpen && isLoggedIn && (
                                             <div className="hidden md:block absolute right-0 top-full">

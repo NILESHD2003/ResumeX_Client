@@ -966,6 +966,14 @@ export const onboardingStore = create()(
                 set((state) => ({
                     completedSections: new Set([...state.completedSections, sectionId])
                 }));
+            },
+
+            removeSectionComplete: (sectionId) => {
+                set((state) => {
+                    const updatedSet = new Set(state.completedSections);
+                    updatedSet.delete(sectionId);
+                    return { completedSections: updatedSet };
+                });
             }
         }),
         {

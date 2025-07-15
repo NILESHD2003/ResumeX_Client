@@ -31,7 +31,10 @@ function CertificationDetails() {
         updateCertificatesEditingIndex,
         addCertificate,
         updateAddCertificate,
-        removeCertificates
+        removeCertificates,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -117,9 +120,7 @@ function CertificationDetails() {
                     await addCertificates(newCertificate);
                     const updatedCertificate = onboardingStore.getState().certificates;
                     await updateOriginalData({certificates: updatedCertificate});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("certificates");
                 }          
             } else {
                 const original = certificates[certificatesEditingIndex]
@@ -197,6 +198,10 @@ function CertificationDetails() {
         try {
             await deleteCertificateDetail(certificates[index]._id);
             removeCertificates(index);
+            const updatedCertificates = onboardingStore.getState().certificates;
+            if (updatedCertificates.length === 0 && completedSections.has("certificates")) {
+                await removeSectionComplete("certificates");
+            }
         } catch (error) {
             
         }

@@ -21,7 +21,10 @@ function ReferencesDetails() {
         updateReferencesEditingIndex,
         addReference,
         updateAddReference,
-        removeReferences
+        removeReferences,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const isExpanded = expandedSections.has("references");
@@ -69,7 +72,7 @@ function ReferencesDetails() {
                     await addReferences(newReference);
                     const updatedReference = onboardingStore.getState().references;
                     await updateOriginalData({references: updatedReference});
-                    
+                    await markSectionComplete("references");
                 }          
             } else {
                 const original = references[referencesEditingIndex]
@@ -144,6 +147,10 @@ function ReferencesDetails() {
         try {
             await deleteReferenceDetail(references[index]._id);
             removeReferences(index);
+            const updatedReferences = onboardingStore.getState().references;
+            if (updatedReferences.length === 0 && completedSections.has("references")) {
+                await removeSectionComplete("references");
+            }
         } catch (error) {
             
         }

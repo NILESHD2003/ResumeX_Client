@@ -21,7 +21,10 @@ function AwardDetails() {
         updateAwardsEditingIndex,
         addAward,
         updateAddAward,
-        removeAwards
+        removeAwards,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const isExpanded = expandedSections.has("awards");
@@ -79,6 +82,7 @@ function AwardDetails() {
                     await addAwards(newAward);
                     const updatedAward = onboardingStore.getState().awards;
                     await updateOriginalData({awards: updatedAward});
+                    await markSectionComplete("awards");
                 }          
             } else {
                 const original = awards[awardsEditingIndex]
@@ -147,6 +151,10 @@ function AwardDetails() {
         try {
             await deleteAwardDetail(awards[index]._id);
             removeAwards(index);
+            const updatedAward = onboardingStore.getState().awards;
+            if (updatedAward.length === 0 && completedSections.has("awards")) {
+                await removeSectionComplete("awards");
+            }
         } catch (error) {
             
         }
