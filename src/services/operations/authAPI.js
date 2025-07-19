@@ -18,7 +18,7 @@ export async function sendMagicLink(email, navigate) {
                 "email": email,
             })
             if (response.data.success) {
-                useMagicLinkStore.getState().setMagicLink(response.data.data);
+                await useMagicLinkStore.getState().setMagicLink(response.data.data);
                 console.log(response.data.data)     
                 navigate('/create-account')
             }
@@ -132,6 +132,7 @@ async function profileSetup() {
     const updateDeclaration = onboardingStore.getState().updateDeclaration;
     const markSectionComplete = onboardingStore.getState().markSectionComplete;
     const updateOriginalData = onboardingStore.getState().updateOriginalData;
+    const addPublications = onboardingStore.getState().addPublications;
 
     try {
         const data = await getProfileDetails();
@@ -197,6 +198,12 @@ async function profileSetup() {
                 markSectionComplete("courses");
             }
         }
+        if (data.publications) {
+            addPublications(data.publications);
+            if (data.publications.length > 0) {
+                markSectionComplete("publications");
+            }
+        }
         if (data.organizations) {
             addOrganizations(data.organizations);
             if (data.organizations.length > 0) {
@@ -211,8 +218,8 @@ async function profileSetup() {
         }
         if (data.declaration) {
             updateDeclaration(data.declaration);
-            if (data.educationDetails.length > 0) {
-                markSectionComplete("educationDetails");
+            if (data.declaration.signature || data.declaration.text || data.declaration.fullName || data.declaration.date || data.declaration.place) {
+                markSectionComplete("declaration");
             }
         }
     } catch (error) {
