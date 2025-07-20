@@ -1,6 +1,7 @@
 import React from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {FileText, X, Menu, Crown, LogOut, User, ChevronDown, ChevronUp, Settings} from 'lucide-react'
+import { onboardingStore } from '../../stores/onboardingStore';
 
 function Navbar() {
     const [isScrolled, setIsScrolled] = React.useState(false);
@@ -8,7 +9,7 @@ function Navbar() {
     const location = useLocation();
     const isAuthPage = ['/login', '/signup', '/create-account'].includes(location.pathname);
     const isOnboardingPage = location.pathname.startsWith('/onboarding');
-    const isLoggedIn = ['/dashboard', '/onboarding', '/generate/resume', '/generate/cover-letter'].includes(location.pathname);
+    const isLoggedIn = ['/dashboard', '/onboarding', '/generate/resume', '/generate/cover-letter', '/resume-editor'].includes(location.pathname);
 
     React.useEffect(() => {
         const handleWindowScroll = () => {
@@ -20,12 +21,17 @@ function Navbar() {
         return (() => window.removeEventListener("scroll", handleWindowScroll));
     });
 
+    const {
+        originalData
+    } = onboardingStore();
+
     if (isAuthPage) return null;
 
     const handleLogout = () => {
         // Handle logout logic here
         console.log('Logout clicked');
         // Redirect to home page or login page
+        localStorage.clear();
         window.location.href = '/';
     };
 
@@ -33,13 +39,15 @@ function Navbar() {
         setIsMenuOpen(!isMenuOpen);
     }
 
+
+
     // Profile Dropdown Menu JSX (only for desktop dropdown, not mobile)
     const ProfileDropdownMenu = (
         <div
             className="bg-gray-900 absolute right-0 mt-2 w-64 rounded-lg shadow-lg flex flex-col space-y-4 z-50 p-4 border-gray-600 border">
             <div className='space-x-2 px-4 py-1'>
-                <h2 className='font-bold text-lg'>John Doe</h2>
-                <h4 className='text-base text-gray-400'>john.doe@example.com</h4>
+                <h2 className='font-bold text-lg'>{originalData.name}</h2>
+                <h4 className='text-base text-gray-400'>{originalData.email}</h4>
             </div>
             <hr className='text-gray-400'></hr>
             <div className='flex items-center space-x-2 px-4 py-1 cursor-pointer hover:bg-gray-800 rounded'>
@@ -75,22 +83,31 @@ function Navbar() {
                                         <span className="text-sm font-medium">Upgrade to PRO</span>
                                     </button>
                                     <div className="relative">
-                                        <button className='' onClick={handleNavMenu}>{isMenuOpen ? isLoggedIn ? <button
-                                            className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors">
-                                            <div
-                                                className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                                <User className="h-5 w-5 text-white"/>
-                                            </div>
-                                            <ChevronUp className={`h-4 w-4 text-gray-400 transition-transform`}/>
-                                        </button> : <X size={24}></X> : isLoggedIn ? <button
-                                            className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors"
-                                        >
-                                            <div
-                                                className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                                <User className="h-5 w-5 text-white"/>
-                                            </div>
-                                            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform`}/>
-                                        </button> : <Menu size={24}></Menu>}</button>
+                                        <button className='' onClick={handleNavMenu}>
+                                            {isMenuOpen ? (
+                                                isLoggedIn ? (
+                                                <span className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-white" />
+                                                    </div>
+                                                    <ChevronUp className="h-4 w-4 text-gray-400 transition-transform" />
+                                                </span>
+                                                ) : (
+                                                <X size={24} />
+                                                )
+                                            ) : (
+                                                isLoggedIn ? (
+                                                <span className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-white" />
+                                                    </div>
+                                                    <ChevronDown className="h-4 w-4 text-gray-400 transition-transform" />
+                                                </span>
+                                                ) : (
+                                                <Menu size={24} />
+                                                )
+                                            )}
+                                        </button>
                                         {/* Desktop Profile Dropdown - only for desktop */}
                                         {isMenuOpen && isLoggedIn && (
                                             <div className="hidden md:block absolute right-0 top-full">

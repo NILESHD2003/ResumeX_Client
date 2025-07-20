@@ -22,7 +22,10 @@ function ProfileSummary() {
         updateProfileSummary,
         originalData,
         updateOriginalData,
-        expandedSections
+        expandedSections,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const isExpanded = expandedSections.has("profileSummary");
@@ -73,10 +76,17 @@ function ProfileSummary() {
         try {
             await patchProfileSummaryDetails(profileSummary);
             updateOriginalData({profileSummary: profileSummary});
+            await markSectionComplete("profileSummary");
         } catch (error) {
             console.error("Update failed", error);
         }
     }
+
+    React.useEffect(() => {
+        if (editor && originalData.profileSummary !== undefined) {
+            editor.commands.setContent(originalData.profileSummary || "<p>Write your summary...</p>");
+        }
+    }, [editor, originalData.profileSummary]);
 
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden max-w-4xl">

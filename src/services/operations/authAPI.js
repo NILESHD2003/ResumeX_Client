@@ -18,7 +18,7 @@ export async function sendMagicLink(email, navigate) {
                 "email": email,
             })
             if (response.data.success) {
-                useMagicLinkStore.getState().setMagicLink(response.data.data);
+                await useMagicLinkStore.getState().setMagicLink(response.data.data);
                 console.log(response.data.data)     
                 navigate('/create-account')
             }
@@ -130,50 +130,97 @@ async function profileSetup() {
     const addOrganizations = onboardingStore.getState().addOrganizations;
     const addReferences = onboardingStore.getState().addReferences;
     const updateDeclaration = onboardingStore.getState().updateDeclaration;
+    const markSectionComplete = onboardingStore.getState().markSectionComplete;
+    const updateOriginalData = onboardingStore.getState().updateOriginalData;
+    const addPublications = onboardingStore.getState().addPublications;
 
     try {
         const data = await getProfileDetails();
+        if (data) {
+            updateOriginalData(data);
+        }
         if (data.personalDetails) {
             updatePersonalDetails(data.personalDetails);
+            markSectionComplete("personal");
         }
         if (data.profilePicture) {
             updateProfilePicture(data.profilePicture);
         }
         if (data.profileSummary) {
             updateProfileSummary(data.profileSummary);
+            markSectionComplete("profileSummary");
         }
         if (data.educationDetails) {
             addEducationDetails(data.educationDetails);
+            if (data.educationDetails.length > 0) {
+                markSectionComplete("educationDetails");
+            }
         }
         if (data.professionalExperience) {
             addProfessionalExps(data.professionalExperience);
+            if (data.professionalExperience.length > 0) {
+                markSectionComplete("professionalExperience");
+            }
         }
         if (data.skills) {
             addSkills(data.skills);
+            if (data.skills.length > 0) {
+                markSectionComplete("skills");
+            }
         }
         if (data.languages) {
             addLanguages(data.languages);
+            if (data.languages.length > 0) {
+                markSectionComplete("languages");
+            }
         }
         if (data.certificates) {
             addCertificates(data.certificates);
+            if (data.certificates.length > 0) {
+                markSectionComplete("certificates");
+            }
         }
         if (data.projects) {
             addProjects(data.projects);
+            if (data.projects.length > 0) {
+                markSectionComplete("projects");
+            }
         }
         if (data.awards) {
             addAwards(data.awards);
+            if (data.awards.length > 0) {
+                markSectionComplete("awards");
+            }
         }
         if (data.courses) {
             addCourses(data.courses);
+            if (data.courses.length > 0) {
+                markSectionComplete("courses");
+            }
+        }
+        if (data.publications) {
+            addPublications(data.publications);
+            if (data.publications.length > 0) {
+                markSectionComplete("publications");
+            }
         }
         if (data.organizations) {
             addOrganizations(data.organizations);
+            if (data.organizations.length > 0) {
+                markSectionComplete("organizations");
+            }
         }
         if (data.references) {
             addReferences(data.references);
+            if (data.references.length > 0) {
+                markSectionComplete("references");
+            }
         }
         if (data.declaration) {
             updateDeclaration(data.declaration);
+            if (data.declaration.signature || data.declaration.text || data.declaration.fullName || data.declaration.date || data.declaration.place) {
+                markSectionComplete("declaration");
+            }
         }
     } catch (error) {
         console.log("Error occured", error);

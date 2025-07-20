@@ -31,7 +31,10 @@ function EducationDetails() {
         updateAddEducation,
         originalData,
         updateOriginalData,
-        removeEducationDetail
+        removeEducationDetail,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -119,9 +122,7 @@ function EducationDetails() {
                     await addEducationDetail(newEducation);
                     const updatedEducation = onboardingStore.getState().educationDetails;
                     await updateOriginalData({educationDetails: updatedEducation});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("educationDetails");
                 }          
             } else {
                 const original = educationDetails[educationEditingIndex]
@@ -205,6 +206,10 @@ function EducationDetails() {
         try {
             await deleteEducationDetail(educationDetails[index]._id);
             removeEducationDetail(index);
+            const updatedEducations = onboardingStore.getState().educationDetails;
+            if (updatedEducations.length === 0 && completedSections.has("educationDetails")) {
+                await removeSectionComplete("educationDetails");
+            }
         } catch (error) {
             
         }

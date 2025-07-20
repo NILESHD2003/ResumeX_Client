@@ -31,7 +31,10 @@ function ProjectDetails() {
         updateProjectsEditingIndex,
         addProject,
         updateAddProject,
-        removeProjects
+        removeProjects,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -178,9 +181,7 @@ function ProjectDetails() {
                     await addProjects(newProject);
                     const updatedProject = onboardingStore.getState().projects;
                     await updateOriginalData({projects: updatedProject});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("projects");
                 }          
             } else {
                 const original = projects[projectsEditingIndex]
@@ -255,6 +256,10 @@ function ProjectDetails() {
         try {
             await deleteProjectDetail(projects[index]._id);
             removeProjects(index);
+            const updatedProjects = onboardingStore.getState().projects;
+            if (updatedProjects.length === 0 && completedSections.has("projects")) {
+                await removeSectionComplete("projects");
+            }
         } catch (error) {
             
         }
@@ -409,7 +414,7 @@ function ProjectForm({data, editor, handleSave, handleChange, projectsEditingInd
                             >
                                 <option value="">Platform</option>
                                 <option value="GITHUB">Github</option>
-                                <option value="WEBSITE"></option>
+                                <option value="WEBSITE">Website</option>
                                 <option value="PLAY_STORE"> Store</option>
                                 <option value="APP_STORE">App Store</option>
                                 <option value="OTHER">Other</option>

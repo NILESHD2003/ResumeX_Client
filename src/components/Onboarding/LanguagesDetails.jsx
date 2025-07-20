@@ -31,7 +31,10 @@ function LanguagesDetails() {
         updateLanguagesEditingIndex,
         addLanguage,
         updateAddLanguage,
-        removeLanguages
+        removeLanguages,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -108,7 +111,7 @@ function LanguagesDetails() {
                     await addLanguages(newLanguages);
                     const updatedLanguages = onboardingStore.getState().languages;
                     await updateOriginalData({languages: updatedLanguages});
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("languages");
                 }          
             } else {
                 const original = languages[languagesEditingIndex]
@@ -174,6 +177,10 @@ function LanguagesDetails() {
         try {
             await deleteLanguageDetail(languages[index]._id);
             removeLanguages(index);
+            const updatedLanguages = onboardingStore.getState().languages;
+            if (updatedLanguages.length === 0 && completedSections.has("languages")) {
+                await removeSectionComplete("languages");
+            }
         } catch (error) {
             
         }

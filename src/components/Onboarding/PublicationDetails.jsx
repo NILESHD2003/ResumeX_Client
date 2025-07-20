@@ -31,7 +31,10 @@ function PublicationDetails() {
         updatePublicationsEditingIndex,
         addPublication,
         updateAddPublication,
-        removePublications
+        removePublications,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -117,9 +120,7 @@ function PublicationDetails() {
                     await addPublications(newPublication);
                     const updatedPublication = onboardingStore.getState().publications;
                     await updateOriginalData({publications: updatedPublication});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("publications");
                 }          
             } else {
                 const original = publications[publicationsEditingIndex]
@@ -191,6 +192,10 @@ function PublicationDetails() {
         try {
             await deletePublicationDetail(publications[index]._id);
             removePublications(index);
+            const updatedPublications = onboardingStore.getState().publications;
+            if (updatedPublications.length === 0 && completedSections.has("publications")) {
+                await removeSectionComplete("publications");
+            }
         } catch (error) {
             
         }

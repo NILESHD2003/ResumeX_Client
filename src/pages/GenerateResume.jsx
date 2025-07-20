@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {Link2, FileText, Check, Clock, ArrowLeft, Edit} from 'lucide-react';
-
+import { sumbitNewJobRequest, checkJobStatus } from '../services/operations/AgenticAI_API';
+import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const GenerateResume = () => {
     const [inputType, setInputType] = useState('description');
@@ -9,56 +11,180 @@ const GenerateResume = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [progressSteps, setProgressSteps] = useState([]);
     const [isComplete, setIsComplete] = useState(false);
-    const [error, setError] = useState(true);
+    const [error, setError] = useState(false);
 
-    const mockProgressSteps = [
-        {id: '0', label: 'Job Description Analyzed', status: 'pending'},
-        {id: '1', label: 'Skills Mapped', status: 'pending'},
-        {id: '2', label: 'Experience Matched', status: 'pending'},
-        {id: '3', label: 'Resume Structure Optimized', status: 'pending'},
-        {id: '4', label: 'ATS Compatibility Verified', status: 'pending'},
-        {id: '5', label: 'Final Review Complete', status: 'pending'}
+    const navigate = useNavigate();
+
+    const realProgressSteps = [
+        { id: '0', key: 'PENDING', label: 'Job Received', progress: 'pending' },
+        { id: '1', key: 'ANALYZING_JD', label: 'Analyzing Job Description', progress: 'pending' },
+        { id: '2', key: 'JD_ANALYZED', label: 'Job Description Analyzed', progress: 'pending' },
+        { id: '3', key: 'RANKING_PROJECTS', label: 'Ranking Projects', progress: 'pending' },
+        { id: '4', key: 'PROJECTS_RANKED', label: 'Projects Ranked', progress: 'pending' },
+        { id: '5', key: 'RANKING_SKILLS', label: 'Ranking Skills', progress: 'pending' },
+        { id: '6', key: 'SKILLS_RANKED', label: 'Skills Ranked', progress: 'pending' },
+        { id: '7', key: 'GENERATING_PROJECT_DESCRIPTION', label: 'Generating Project Descriptions', progress: 'pending' },
+        { id: '8', key: 'PROJECT_DESCRIPTION_GENERATED', label: 'Project Descriptions Generated', progress: 'pending' },
+        { id: '9', key: 'COMPLETED', label: 'Resume Generation Complete', progress: 'pending' },
     ];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!inputValue.trim() || !agreed) return;
+        if (!inputValue.trim()) {
+            toast.error("Description/Link should not be Empty.", {
+                style: {
+                    border: '1px solid orange',
+                    backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                    color: 'orange'
+                }
+            });
+            return;
+        };
+        if (!agreed) {
+            toast.error("Agree with terms", {
+                style: {
+                    border: '1px solid orange',
+                    backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                    color: 'orange'
+                }
+            });
+            return;
+        }
 
-        setIsGenerating(true);
-        setProgressSteps([]);
+        try {
+            const job = inputType === "description" 
+            ? { jobDescription: inputValue }
+            : { jobLink: inputValue };
 
-        // Simulate progress updates
-        simulateProgress();
+            toast.success("Starting Resume Generation.", {
+                style: {
+                    border: '1px solid rgba(47, 200, 122, 0.5)',
+                    backgroundColor: 'rgba(47, 200, 122, 0.1)', // Light background version
+                    color: '#2fc87a'
+                }
+            })
+    
+            const jobId = await sumbitNewJobRequest(job);
+            setIsGenerating(true);
+            setProgressSteps([]);
+            pollJobProgress(jobId);
+        } catch (error) {
+            toast.error("Unknown Error occured", {
+                    style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            })
+        }
     };
 
-    const simulateProgress = () => {
-        let currentStep = 0;
-        setProgressSteps([]); // Reset steps at the start
-        const interval = setInterval(() => {
-            if (currentStep < mockProgressSteps.length) {
-                const timestamp = new Date().toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+    const pollJobProgress = (jobId) => {
+        let lastUpdateTime = Date.now();
+        let lastKnownStatus = null;
 
-                setProgressSteps(prev => {
-                    // Mark all previous steps as completed, add the current one
-                    const updated = mockProgressSteps.slice(0, currentStep + 1).map((step, idx) => ({
-                        ...step,
-                        status: 'completed',
-                        timestamp: idx === currentStep ? timestamp : prev[idx]?.timestamp || timestamp,
-                        showDetails: prev[idx]?.showDetails !== undefined ? prev[idx].showDetails : true // default open
-                    }));
-                    return updated;
-                });
+        const interval = setInterval(async () => {
+            try {
+            const response = await checkJobStatus(jobId);
+            console.log(error);
 
-                currentStep++;
-            } else {
+            if (!response || !Array.isArray(response)) {
                 clearInterval(interval);
-                setIsComplete(true);
+                setError(true);
+                setIsGenerating(false);
+                return;
             }
-        }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds
+
+            const parsedLogs = response
+                .map(log => {
+                try {
+                    return JSON.parse(log);
+                } catch {
+                    return null;
+                }
+                })
+                .filter(Boolean);
+
+            if (parsedLogs.length === 0) return;
+
+            const latestLog = parsedLogs[0]; // ⬅️ Latest is at the top
+            const latestStatus = latestLog.status;
+
+            // ⏳ Timeout: if no new update in 45s
+            if (latestStatus !== lastKnownStatus) {
+                lastKnownStatus = latestStatus;
+                lastUpdateTime = Date.now();
+            } else if (Date.now() - lastUpdateTime > 45000) {
+                clearInterval(interval);
+                setError(true);
+                    toast.error("Error occured while generating. \n Make sure to have following details filled: Personal Details, Projects, Skills", {
+                        style: {
+                        border: '1px solid rgba(251, 44, 54, 0.5)',
+                        backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                        color: '#fb2c36'
+                    }
+                })
+                setIsGenerating(false);
+                return;
+            }
+
+            // ✅ Completion
+            if (latestStatus === "COMPLETED") {
+                clearInterval(interval);
+                setError(false);
+                setIsComplete(true);
+                toast.success("Resume Generation is Complete", {
+                    style: {
+                        border: '1px solid rgba(47, 200, 122, 0.5)',
+                        backgroundColor: 'rgba(47, 200, 122, 0.1)', // Light background version
+                        color: '#2fc87a'
+                    }
+                });
+            }
+
+            // List of all seen statuses
+            const completedStatuses = parsedLogs.map(log => log.status);
+
+            // Update UI progress
+            const updatedSteps = realProgressSteps.map((step, idx) => {
+                const matchingLog = parsedLogs.find(log => log.status === step.key);
+
+                if (completedStatuses.includes(step.key)) {
+                return {
+                    ...step,
+                    progress: "completed",
+                    timestamp: matchingLog?.timestamp || null,
+                    showDetails: true,
+                };
+                } else if (realProgressSteps[idx - 1]?.key === latestStatus) {
+                return {
+                    ...step,
+                    progress: "in-progress",
+                    showDetails: false,
+                };
+                } else {
+                return {
+                    ...step,
+                    progress: "pending",
+                    showDetails: false,
+                };
+                }
+            });
+
+            setProgressSteps(updatedSteps);
+            } catch (err) {
+            clearInterval(interval);
+            setError(true);
+            toast.error("Unknown Error occured", {
+                    style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            })
+            console.error("❌ Error polling job status:", err);
+            }
+        }, 1500);
     };
 
     const resetForm = () => {
@@ -73,6 +199,10 @@ const GenerateResume = () => {
     if (isGenerating) {
         return (
             <div className="min-h-screen bg-gray-950 pt-24 pb-12">
+                <Toaster 
+                    position='bottom-right'
+                    reverseOrder={false}
+                />
                 <div className="container mx-auto px-4 md:px-6 max-w-4xl">
                     {/* Warning message about refreshing */}
                     <div className="mb-4 flex items-center justify-center">
@@ -109,13 +239,13 @@ const GenerateResume = () => {
                                     {/* Status Icon */}
                                     <div
                                         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                            step.status === 'completed'
+                                            step.progress === 'completed'
                                                 ? 'bg-green-600 text-white'
-                                                : step.status === 'in-progress'
+                                                : step.progress === 'in-progress'
                                                     ? 'bg-indigo-600 text-white animate-pulse'
                                                     : 'bg-gray-700 text-gray-400'
                                         }`}>
-                                        {step.status === 'completed' ? (
+                                        {step.progress === 'completed' ? (
                                             <Check className="h-4 w-4"/>
                                         ) : (
                                             <Clock className="h-4 w-4"/>
@@ -127,7 +257,7 @@ const GenerateResume = () => {
                                         <div
                                             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                             <h3 className={`font-medium ${
-                                                step.status === 'completed' ? 'text-white' : 'text-gray-400'
+                                                step.progress === 'completed' ? 'text-white' : 'text-gray-400'
                                             }`}>
                                                 {step.label}
                                             </h3>
@@ -162,7 +292,7 @@ const GenerateResume = () => {
                             ))}
 
                             {/* Loading indicator for next step */}
-                            {progressSteps.length < mockProgressSteps.length && progressSteps.length > 0 && (
+                            {progressSteps.length < realProgressSteps.length && progressSteps.length > 0 && (
                                 <div className="flex items-start space-x-4 opacity-50">
                                     <div
                                         className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center animate-pulse">
@@ -170,7 +300,7 @@ const GenerateResume = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-medium text-gray-500">
-                                            {mockProgressSteps[progressSteps.length]?.label}
+                                            {realProgressSteps[progressSteps.length]?.label}
                                         </h3>
                                     </div>
                                 </div>
@@ -186,8 +316,9 @@ const GenerateResume = () => {
                                     </div>
                                     <h3 className="text-xl font-semibold mb-2">Resume Generated Successfully!</h3>
                                     <p className="text-gray-400 mb-6">Your tailored resume is ready for review and editing.</p>
-
-                                    <button className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-lg transition-all transform hover:scale-105 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950">
+                                    <button
+                                        onClick={() => navigate('/resume-editor')}
+                                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-lg transition-all transform hover:scale-105 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950">
                                         <div className="flex items-center justify-center space-x-2">
                                             <Edit className="h-5 w-5" />
                                             <span>Open in Resume Editor</span>
@@ -217,6 +348,16 @@ const GenerateResume = () => {
                                             <span>Report Error</span>
                                         </div>
                                     </button>
+                                    <button 
+                                        onClick={() => {resetForm}}
+                                        className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-3 px-8 rounded-lg transition-all transform hover:scale-105 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-950">
+                                        <div className="flex items-center justify-center space-x-2">
+                                            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M3 12l18-7-7 18-2-7-7-4z" />
+                                            </svg>
+                                            <span>Generate Again</span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -228,6 +369,10 @@ const GenerateResume = () => {
 
     return (
         <div className="min-h-screen bg-gray-950 pt-24 pb-12">
+            <Toaster 
+                position='bottom-right'
+                reverseOrder={false}
+            />
             <div className="container mx-auto px-4 md:px-6 max-w-4xl">
                 {/* Header */}
                 <div className="mb-8">

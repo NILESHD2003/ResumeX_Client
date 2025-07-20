@@ -31,7 +31,10 @@ function ProfessionalExperiences() {
         updateProfessionalExpEditingIndex,
         addProfessionalExp,
         updateAddProfessionalExp,
-        removeProfessionalExps
+        removeProfessionalExps,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -117,9 +120,7 @@ function ProfessionalExperiences() {
                     await addProfessionalExps(newProfessionalExp);
                     const updatedProfessionalExp = onboardingStore.getState().professionalExperience;
                     await updateOriginalData({professionalExperience: updatedProfessionalExp});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("professionalExperience");
                 }          
             } else {
                 const original = professionalExperience[professionalExpEditingIndex]
@@ -200,6 +201,10 @@ function ProfessionalExperiences() {
         try {
             await deleteProfessionalExperience(professionalExperience[index]._id);
             removeProfessionalExps(index);
+            const updatedProfExp = onboardingStore.getState().professionalExperience;
+            if (updatedProfExp.length === 0 && completedSections.has("professionalExperience")) {
+                await removeSectionComplete("professionalExperience");
+            }
         } catch (error) {
             
         }

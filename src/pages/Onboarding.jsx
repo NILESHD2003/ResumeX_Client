@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProgressBar from "../components/Onboarding/ProgressBar.jsx";
 import PersonalDetails from "../components/Onboarding/PersonalDetails.jsx";
 import { Toaster } from 'react-hot-toast';
@@ -17,12 +17,18 @@ import OrganizationDetails from '../components/Onboarding/OrganizationDetails.js
 import PublicationDetails from '../components/Onboarding/PublicationDetails.jsx';
 import ReferencesDetails from '../components/Onboarding/ReferencesDetails.jsx';
 import DeclarationDetails from '../components/Onboarding/DeclarationDetail.jsx';
+import OnboardingPreview from '../components/Onboarding/OnboardingPreview.jsx';
+import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function Onboarding() {
     const {
-        updateOriginalData
+        updateOriginalData,
+        completedSections
     } = onboardingStore();
+    const [showPreview, setShowPreview] = useState(false);
 
+    const navigate = useNavigate();
     useEffect(() => {
         const OriginalData = async () => {
             const data = await getProfileDetails();
@@ -53,6 +59,17 @@ function Onboarding() {
                         </p>
                     </div>
                 </div>
+
+                {/* Show Preview Button */}
+                <div className="text-right mb-4">
+                    <button
+                        onClick={() => setShowPreview(true)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition"
+                    >
+                        Show Preview
+                    </button>
+                </div>
+
                 {/*  Progress Bar  */}
                 <ProgressBar></ProgressBar>
 
@@ -73,7 +90,39 @@ function Onboarding() {
                     <ReferencesDetails></ReferencesDetails>
                     <DeclarationDetails></DeclarationDetails>
                 </div>
+                <div className="mt-10 flex justify-center">
+                    {completedSections.size === 0 ? (
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="bg-gray-700 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition"
+                        >
+                            Skip
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition"
+                        >
+                            Complete
+                        </button>
+                    )}
+                </div>
             </div>
+            {showPreview && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="relative w-full max-w-[90vw] md:max-w-[210mm] max-h-[95vh] overflow-auto bg-white shadow-2xl rounded-xl scrollbar-hide">
+                    <button
+                        onClick={() => setShowPreview(false)}
+                        className="absolute top-4 right-4 z-10 text-gray-700 hover:text-red-500"
+                    >
+                        <X size={24} />
+                    </button>
+                    <div className="p-6 md:p-10">
+                        <OnboardingPreview />
+                    </div>
+                </div>
+            </div>
+            )}
         </div>
     );
 }

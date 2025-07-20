@@ -31,7 +31,10 @@ function CourseDetails() {
         updateCoursesEditingIndex,
         addCourse,
         updateAddCourse,
-        removeCourses
+        removeCourses,
+        completedSections,
+        markSectionComplete,
+        removeSectionComplete
     } = onboardingStore();
 
     const editor = useEditor({
@@ -117,9 +120,7 @@ function CourseDetails() {
                     await addCourses(newCourse);
                     const updatedCourse = onboardingStore.getState().courses;
                     await updateOriginalData({courses: updatedCourse});
-                    
-                    // Clear tiptap content
-                    editor.commands.setContent('<p>Write your summary...</p>');
+                    await markSectionComplete("courses");
                 }          
             } else {
                 const original = courses[coursesEditingIndex]
@@ -197,6 +198,10 @@ function CourseDetails() {
         try {
             await deleteCourseDetail(courses[index]._id);
             removeCourses(index);
+            const updatedCourses = onboardingStore.getState().courses;
+            if (updatedCourses.length === 0 && completedSections.has("courses")) {
+                await removeSectionComplete("courses");
+            }
         } catch (error) {
             
         }
