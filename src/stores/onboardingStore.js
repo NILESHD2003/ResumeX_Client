@@ -738,6 +738,33 @@ export const onboardingStore = create()(
 
             clearListData: () => {
                 set({
+                    personalDetails: {
+                        fullName: '',
+                        jobTitle: '',
+                        email: '',
+                        phone: '',
+                        location: '',
+                        personalInfo: '',
+                        dateOfBirth: '',
+                        nationality: '',
+                        passport_govt_id: '',
+                        maritalStatus: '',
+                        militaryService: '',
+                        drivingLicense: '',
+                        genderPronoun: '',
+                        visa: '',
+                        socialLinks: [
+                            // { platform: 'linkedin', url: '', link: '' },
+                            // { platform: 'github', url: '', link: '' },
+                            // { platform: 'twitter', url: '', link: '' },
+                            // { platform: 'youtube', url: '', link: '' },
+                            // { platform: 'dribbble', url: '', link: '' },
+                            // { platform: 'behance', url: '', link: '' },
+                            // { platform: 'stackoverflow', url: '', link: '' },
+                            // { platform: 'website', url: '', link: '' },
+                        ],
+                    },
+                    profileSummary: "",
                     educationDetails: [],
                     professionalExperience: [],
                     skills: [],
@@ -749,6 +776,7 @@ export const onboardingStore = create()(
                     organizations: [],
                     publications: [],
                     references: [],
+                    completedSections: new Set(),
                 })
             },
 

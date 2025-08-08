@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image, Link } from '@react-pdf/renderer';
 import { resumeStore } from '../../../stores/resumeStores';
 import { useEditor } from '@tiptap/react';
 import Section from './PreviewSections/Sections';
@@ -28,11 +28,26 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 10
   },
+  jobTitle: {
+    fontSize: 15,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  contactContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  contactText: {
+    fontSize: 12,
+    marginRight: 15,
+    color: '#000000',
+    textDecoration: 'none'
+  },
   header: {
     fontSize: 20,
     marginBottom: 10,
     textAlign: 'center',
-    textTransform: 'uppercase'
   },
   title: {
     fontSize: 14,
@@ -194,6 +209,17 @@ function ResumePreview() {
         console.log(editingResume)
     }, [])
 
+    const extractHandle = (url) => {
+      if (!url) return '';
+      try {
+        const parsedUrl = new URL(url);
+        const pathSegments = parsedUrl.pathname.split('/').filter(Boolean);
+        return pathSegments[pathSegments.length - 1];
+      } catch {
+        return url;
+      }
+    };
+
   return (
     <Document style={{ backgroundColor: '#030712' }}>
         <Page size="A4" style={metadata.spacing}>
@@ -202,6 +228,28 @@ function ResumePreview() {
                     <Image src={editingResume.profilePicture} style={styles.image} />
                 )}
                 <Text style={styles.header}>{editingResume.personalDetails.fullName}</Text>
+                <Text style={styles.jobTitle}>{editingResume.personalDetails.jobTitle}</Text>
+                 <View style={styles.contactContainer}>
+                  {editingResume.personalDetails.email && (
+                    <Text style={styles.contactText}>
+                      {editingResume.personalDetails.email}
+                    </Text>
+                  )}
+                  {editingResume.personalDetails.phone && (
+                    <Text style={styles.contactText}>
+                      {editingResume.personalDetails.phone}
+                    </Text>
+                  )}
+                  {editingResume.personalDetails.socialLinks?.map((link, index) => (
+                    <Link
+                      key={index}
+                      src={link.url}
+                      style={styles.contactText}
+                    >
+                      {extractHandle(link.url)}
+                    </Link>
+                  ))}
+                </View>
             </View>
             {editingResume.educationDetails.length > 0 && (
                 <Section title="Education" type={metadata.heading.headingStyle}>
