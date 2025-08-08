@@ -736,6 +736,22 @@ export const onboardingStore = create()(
                 }));
             },
 
+            clearListData: () => {
+                set({
+                    educationDetails: [],
+                    professionalExperience: [],
+                    skills: [],
+                    languages: [],
+                    certificates: [],
+                    projects: [],
+                    awards: [],
+                    courses: [],
+                    organizations: [],
+                    publications: [],
+                    references: [],
+                })
+            },
+
             originalData: {
                 personalDetails: {
                     fullName: '',
