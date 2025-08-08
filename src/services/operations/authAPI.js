@@ -133,11 +133,13 @@ async function profileSetup() {
     const markSectionComplete = onboardingStore.getState().markSectionComplete;
     const updateOriginalData = onboardingStore.getState().updateOriginalData;
     const addPublications = onboardingStore.getState().addPublications;
+    const clearListData = onboardingStore.getState().clearListData;
 
     try {
         const data = await getProfileDetails();
         if (data) {
             updateOriginalData(data);
+            clearListData();
         }
         if (data.personalDetails) {
             updatePersonalDetails(data.personalDetails);

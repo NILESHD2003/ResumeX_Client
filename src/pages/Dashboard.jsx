@@ -1,38 +1,89 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Plus, FileText, Calendar, Eye, ChevronDown, Download, Edit, ShareIcon, Coins} from "lucide-react";
 import {Link} from "react-router-dom";
+import { getUserAllGeneratedResumes } from '../services/operations/resumeDataAPI';
+import { resumeStore } from '../stores/resumeStores';
+import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 function Dashboard() {
     const [activeTab, setActiveTab] = React.useState('all');
     const [openDropdown, setOpenDropdown] = React.useState(null);
 
-    const documents = [{
-        id: '1', title: 'Resume for Google SDE Role', type: 'Resume', date: '2025-01-15', time: '2:30 PM'
-    }, {
-        id: '2',
-        title: 'Cover Letter for Microsoft PM Position',
-        type: 'Cover Letter',
-        date: '2025-01-14',
-        time: '4:15 PM'
-    }, {
-        id: '3', title: 'Resume for Amazon Frontend Developer', type: 'Resume', date: '2025-01-13', time: '10:45 AM'
-    }, {
-        id: '4',
-        title: 'Cover Letter for Netflix Data Scientist',
-        type: 'Cover Letter',
-        date: '2025-01-12',
-        time: '3:20 PM'
-    }, {
-        id: '5', title: 'Resume for Apple iOS Developer', type: 'Resume', date: '2025-01-11', time: '11:30 AM'
-    }, {
-        id: '6',
-        title: 'Cover Letter for Facebook UX Designer',
-        type: 'Cover Letter',
-        date: '2024-01-17',
-        time: '4:30 PM'
-    }];
+    const {
+        resumes,
+        setResumes,
+        setEditingResume
+    } = resumeStore();
 
-    // const documents = []
+    const navigate = useNavigate();
+
+    // const documents = [{
+    //     id: '1', title: 'Resume for Google SDE Role', type: 'Resume', date: '2025-01-15', time: '2:30 PM'
+    // }, {
+    //     id: '2',
+    //     title: 'Cover Letter for Microsoft PM Position',
+    //     type: 'Cover Letter',
+    //     date: '2025-01-14',
+    //     time: '4:15 PM'
+    // }, {
+    //     id: '3', title: 'Resume for Amazon Frontend Developer', type: 'Resume', date: '2025-01-13', time: '10:45 AM'
+    // }, {
+    //     id: '4',
+    //     title: 'Cover Letter for Netflix Data Scientist',
+    //     type: 'Cover Letter',
+    //     date: '2025-01-12',
+    //     time: '3:20 PM'
+    // }, {
+    //     id: '5', title: 'Resume for Apple iOS Developer', type: 'Resume', date: '2025-01-11', time: '11:30 AM'
+    // }, {
+    //     id: '6',
+    //     title: 'Cover Letter for Facebook UX Designer',
+    //     type: 'Cover Letter',
+    //     date: '2024-01-17',
+    //     time: '4:30 PM'
+    // }];
+
+    const generateDocumentList = (resumes) => {
+        const now = new Date();
+        const formattedDate = now.toISOString().split('T')[0];
+        const formattedTime = now.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        });
+
+        return resumes.map((resume, index) => ({
+            id: resume._id,
+            title: `Software Engineer ${index + 1}`,
+            type: 'Resume',
+            date: formattedDate,
+            time: formattedTime
+        }));
+    };
+
+    const documents = generateDocumentList(resumes);
+
+    const loadDocumnents = async () => {
+        try {
+            const data = await getUserAllGeneratedResumes();
+            console.log(data);
+            await setResumes(data);
+        } catch (error) {
+            console.log("Error Occured", error);
+            toast.error("Unknown Error occured.", {
+                style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            })
+        }
+    }
+
+    useEffect(() => {
+        loadDocumnents();
+    }, [])
 
     documents.sort((a, b) => new Date(b.date) - new Date(a.date) || new Date(b.time) - new Date(a.time));
 
@@ -54,7 +105,7 @@ function Dashboard() {
         setOpenDropdown(openDropdown === docId ? null : docId);
     };
 
-    const handleAction = (action, docId, docTitle) => {
+    const handleAction = async (action, docId, docTitle) => {
         console.log(`${action} action for document ${docId}: ${docTitle}`);
         setOpenDropdown(null);
 
@@ -68,11 +119,18 @@ function Dashboard() {
                 break;
             case 'edit':
                 // Navigate to editor
+                await setEditingResume(docId);
+                navigate('/resume-editor');
                 break;
         }
     };
 
-    return (<div className='min-h-screen bg-gray-950 pt-24 pb-12'>
+    return (
+    <div className='min-h-screen bg-gray-950 pt-24 pb-12'>
+        <Toaster 
+            position='bottom-right'
+            reverseOrder={false}
+        />
         <div className='container mx-auto px-4 md:px-6'>
             {/*  Header  */}
             <header className='mb-8 flex flex-col justify-between gap-2 md:flex-row'>
