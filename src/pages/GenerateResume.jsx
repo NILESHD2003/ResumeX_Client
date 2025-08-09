@@ -3,6 +3,8 @@ import {Link2, FileText, Check, Clock, ArrowLeft, Edit} from 'lucide-react';
 import { sumbitNewJobRequest, checkJobStatus } from '../services/operations/AgenticAI_API';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { resumeStore } from '../stores/resumeStores';
+import { getUserSpecificResume } from '../services/operations/resumeDataAPI';
 
 const GenerateResume = () => {
     const [inputType, setInputType] = useState('description');
@@ -12,6 +14,12 @@ const GenerateResume = () => {
     const [progressSteps, setProgressSteps] = useState([]);
     const [isComplete, setIsComplete] = useState(false);
     const [error, setError] = useState(false);
+    const [jobID, setJobID] = useState('') 
+
+    const {
+        addResume,
+        setEditingResume
+    } = resumeStore();
 
     const navigate = useNavigate();
 
@@ -27,6 +35,23 @@ const GenerateResume = () => {
         { id: '8', key: 'PROJECT_DESCRIPTION_GENERATED', label: 'Project Descriptions Generated', progress: 'pending' },
         { id: '9', key: 'COMPLETED', label: 'Resume Generation Complete', progress: 'pending' },
     ];
+
+    const handleEdit = async () => {
+        try {
+            const resume = await getUserSpecificResume(jobID);
+            addResume(resume);
+            setEditingResume(jobID);
+            navigate('/resume-editor');
+        } catch (error) {
+            toast.error("Unknown Error occured", {
+                    style: {
+                    border: '1px solid rgba(251, 44, 54, 0.5)',
+                    backgroundColor: 'rgba(251, 44, 54, 0.1)',
+                    color: '#fb2c36'
+                }
+            })
+        }
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,6 +90,7 @@ const GenerateResume = () => {
             })
     
             const jobId = await sumbitNewJobRequest(job);
+            setJobID(jobId);
             setIsGenerating(true);
             setProgressSteps([]);
             pollJobProgress(jobId);
@@ -317,7 +343,7 @@ const GenerateResume = () => {
                                     <h3 className="text-xl font-semibold mb-2">Resume Generated Successfully!</h3>
                                     <p className="text-gray-400 mb-6">Your tailored resume is ready for review and editing.</p>
                                     <button
-                                        onClick={() => navigate('/resume-editor')}
+                                        onClick={() => {handleEdit()}}
                                         className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-lg transition-all transform hover:scale-105 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950">
                                         <div className="flex items-center justify-center space-x-2">
                                             <Edit className="h-5 w-5" />
